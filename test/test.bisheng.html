@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test: Loader.boot() </title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="./bower_components/mocha/mocha.css" rel="stylesheet">
+</head>
+<body>
+    <div id="mocha"></div>
+    <!-- Include local Mocha. -->
+    <script src="./bower_components/mocha/mocha.js"></script>
+    <script src="./bower_components/chai/chai.js"></script>
+    <script>mocha.setup('bdd')</script>
+    <!-- Include RequireJS -->
+    <script src="./bower_components/requirejs/require.js"></script>
+    <script type="text/javascript">
+        require.config({
+            paths: {
+                'brix/bisheng': '../dist/bisheng',
+                jquery: 'bower_components/jquery/dist/jquery',
+                underscore: 'bower_components/underscore/underscore',
+                handlebars: 'bower_components/handlebars/handlebars'
+            }
+        })
+    </script>
+
+    <hr>
+    
+    <style type="text/css">
+        .container {
+            margin: 8px 0px 0px 0px;
+            float: left;
+            width: 50%;
+        }
+    </style>
+    <div class="container"></div>
+    <div class="container"></div>
+    <div class="container"></div>
+    <div class="container"></div>
+
+    <!-- Include the actual tests. -->
+    <!-- 单个功能测试 -->
+    <script src="./test.bisheng.loop.js"></script>
+    <script src="./test.bisheng.ast.js"></script>
+    <script src="./test.bisheng.locator.js"></script>
+    <!-- 集成测试 -->
+    <script src="./test.bisheng.expression.js"></script>
+    <script src="./test.bisheng.attribute.js"></script>
+    <script src="./test.bisheng.block.js"></script>
+    <script src="./test.bisheng.form.js"></script>
+    <script src="./test.bisheng.watch.js"></script>
+    <script src="./test.bisheng.mode.js"></script>
+    
+    <!-- PhantomJS -->
+    <script type="text/javascript">
+         if (window.mochaPhantomJS) {
+             mochaPhantomJS.run()
+         } else {
+             mocha.run()
+         }
+    </script>
+</body>
+</html>

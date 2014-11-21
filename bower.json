@@ -1,0 +1,23 @@
+{
+  "name": "brix-bisheng",
+  "version": "0.0.0",
+  "authors": [
+    "墨智 <mozhi.gyy@alibaba-inc.com>"
+  ],
+  "moduleType": [
+    "amd"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.1",
+    "handlebars": "~2.0.0",
+    "underscore": "~1.7.0"
+  }
+}

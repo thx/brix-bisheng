@@ -1,0 +1,7 @@
+{
+    "asi": true,
+    "strict": false,
+    "undef": true,
+    "unused": "strict",
+    "multistr": true
+}
