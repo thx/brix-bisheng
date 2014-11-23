@@ -7,6 +7,21 @@ var mochaPhantomJS = require('gulp-mocha-phantomjs')
 var rjs = require('gulp-requirejs')
 var exec = require('child_process').exec
 
+gulp.task('hello', function() {
+    console.log((function() {
+        /*
+______        _        ______  _  _____  _                         
+| ___ \      (_)       | ___ \(_)/  ___|| |                        
+| |_/ / _ __  _ __  __ | |_/ / _ \ `--. | |__    ___  _ __    __ _ 
+| ___ \| '__|| |\ \/ / | ___ \| | `--. \| '_ \  / _ \| '_ \  / _` |
+| |_/ /| |   | | >  <  | |_/ /| |/\__/ /| | | ||  __/| | | || (_| |
+\____/ |_|   |_|/_/\_\ \____/ |_|\____/ |_| |_| \___||_| |_| \__, |
+                                                              __/ |
+                                                             |___/ 
+        */
+    }).toString().split('\n').slice(2, -2).join('\n') + '\n')
+})
+
 // https://github.com/spenceralger/gulp-jshint
 gulp.task('jshint', function() {
     var globs = [
@@ -42,7 +57,7 @@ gulp.task('rjs', function() {
 })
 
 // https://github.com/floatdrop/gulp-watch
-var watchTasks = ['madge', 'jshint', 'rjs', 'test']
+var watchTasks = ['hello', 'madge', 'jshint', 'rjs', 'test']
 gulp.task('watch', function( /*callback*/ ) {
     gulp.watch(['src/**/*.js', 'gulpfile.js', 'test/*'], watchTasks)
 })
