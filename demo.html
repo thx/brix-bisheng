@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test: Brix Event </title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style type="text/css">
+        .transition {
+            transition: background-color 0.5s ease, width 0.5s ease, height 0.5s ease;
+        }
+
+        .highlight {
+            background-color: yellow;
+        }
+    </style>
+</head>
+<body>
+    <!-- Include RequireJS -->
+    <script src="test/bower_components/requirejs/require.js"></script>
+    <script type="text/javascript">
+        require.config({
+            paths: {
+                'brix/bisheng': 'dist/bisheng',
+                jquery: 'bower_components/jquery/dist/jquery',
+                underscore: 'bower_components/underscore/underscore',
+                handlebars: 'bower_components/handlebars/handlebars'
+            }
+        })
+    </script>
+    
+    <script id="hello" type="template">
+        <div class="form-group">
+            <p><input value="{{title}}"></p>
+            <ul>
+            {{#each list}}
+                <li>{{id}}</li>
+            {{/each}}
+            </ul>
+            <br>
+            title: {{title}}
+        </div>
+    </script>
+
+    <div class="container"></div>
+
+
+    <script type="text/javascript">
+        require(['jquery', 'brix/bisheng'], function($, BS) {
+            BS.auto(true)
+            var tpl = $('#hello').html()
+            data = {
+                title: 'title',
+                list: [
+                    { id: 1 },
+                    { id: 2 },
+                    { id: 3 }
+                ]
+            }
+            BS.bind(data, tpl, {
+                resolve: function(content){
+                    $('.container').append(content)
+                },
+                before: function(changes){
+                    console.log('before', changes)
+                },
+                after: function(changes){
+                    console.log('after ', changes)
+                }
+            })
+        })
+    </script>
+
+</body>
+</html>

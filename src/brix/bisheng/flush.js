@@ -57,7 +57,7 @@ define(
 
 
         */
-        function handle(event, change, defined, context) {
+        function handle(event, change, defined, context, options) {
             var paths = Locator.find({
                 slot: 'start',
                 path: change.path.join('.')
@@ -68,31 +68,45 @@ define(
                 change.path.pop()
                 change.type = 'update'
                 change.context = change.getContext(change.root, change.path)()
-                handle(event, change, defined)
+                handle(event, change, defined, context, options)
+                return
             }
 
             _.each(paths, function(path /*, index*/ ) {
                 type = Locator.parse(path, 'type')
-                if (handle[type]) handle[type](path, event, change, defined)
+                if (handle[type]) handle[type](path, event, change, defined, options)
             })
         }
 
-        // 
         /*
            更新属性对应的 Expression 
            更新文本节点的值。
-
         */
-        handle.text = function text(locator, event, change, defined) {
+        handle.text = function text(locator, event, change, defined, options) {
             var guid = Locator.parse(locator, 'guid')
             var helper = Locator.parse(locator, 'helper')
             var target = Locator.parseTarget(locator)
             var content
 
+            // TextNode
             if (target.length === 1 && target[0].nodeType === 3) {
-                // TextNode
                 event.target.push(target[0])
+
+                if (options && options.before) {
+                    options.before([{
+                        type: ['update', 'text'].join('_'),
+                        target: target[0]
+                    }])
+                }
+
                 target[0].nodeValue = change.value
+
+                if (options && options.after) {
+                    options.after([{
+                        type: ['update', 'text'].join('_'),
+                        target: target[0]
+                    }])
+                }
 
             } else {
                 // Element
@@ -102,21 +116,55 @@ define(
                     content = change.value
                 }
 
+                if (options && options.before) {
+                    options.before(
+                        _.map(target, function(item, index) {
+                            return {
+                                type: ['delete', 'block'].join('_'),
+                                target: item
+                            }
+                        })
+                    )
+                }
+
+                $(target).remove()
+
                 /* jshint unused: false */
-                HTML.convert(content).contents()
+                content = HTML.convert(content).contents()
                     .insertAfter(locator)
                     .each(function(index, elem) {
                         event.target.push(elem)
                     })
-                $(target).remove()
+
+                if (options && options.after) {
+                    options.after(
+                        _.map(content, function(item, index) {
+                            return {
+                                type: ['add', 'block'].join('_'),
+                                target: item
+                            }
+                        })
+                    )
+                }
             }
         }
 
         // 更新属性对应的 Expression
-        handle.attribute = function attribute(path, event, change, defined) {
+        handle.attribute = function attribute(path, event, change, defined, options) {
             var currentTarget, name, $target;
             event.target.push(currentTarget = Locator.parseTarget(path)[0])
             $target = $(currentTarget)
+
+            if (options && options.before) {
+                options.before(
+                    _.map($target, function(item, index) {
+                        return {
+                            type: ['update', 'attribute'].join('_'),
+                            target: item
+                        }
+                    })
+                )
+            }
 
             var ast = defined.$blocks[Locator.parse(path, 'guid')]
             var value = ast ? Handlebars.compile(ast)(change.context) : change.value
@@ -162,10 +210,22 @@ define(
                             value
                     })
             }
+
+            if (options && options.after) {
+                options.after(
+                    _.map($target, function(item, index) {
+                        return {
+                            type: ['update', 'attribute'].join('_'),
+                            target: item
+                        }
+                    })
+                )
+            }
         }
 
         // 更新数组对应的 Block，路径 > guid > Block
-        handle.block = function block(locator, event, change, defined) {
+        handle.block = function block(locator, event, change, defined, options) {
+            if (!options) debugger
             var guid = Locator.parse(locator, 'guid')
             var ast = defined.$blocks[guid]
             var context = Loop.clone(change.context, true, change.path.slice(0, -1)) // TODO
@@ -186,7 +246,24 @@ define(
 
             // 如果新内容是空，则移除所有旧节点
             if (content.length === 0) {
+
+                if (options && options.before) {
+                    options.before(
+                        _.map(target, function(item, index) {
+                            return {
+                                type: ['delete', 'block'].join('_'),
+                                target: item
+                            }
+                        })
+                    )
+                }
+
                 $(target).remove()
+
+                if (options && options.after) {
+                    options.after([])
+                }
+
                 return
             }
             // 移除旧节点中多余的
@@ -196,13 +273,33 @@ define(
                 https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
             */
             if (content.length < target.length) {
-                $(target.splice(content.length, target.length - content.length)).remove()
+                var toRemote = $(target.splice(content.length, target.length - content.length))
+
+                if (options && options.before) {
+                    options.before(
+                        _.map(toRemote, function(item, index) {
+                            return {
+                                type: ['delete', 'block'].join('_'),
+                                target: item
+                            }
+                        })
+                    )
+                }
+
+                toRemote.remove()
             }
 
             content.each(function(index, element) {
-                // 新正节点
+                // 新增节点
                 if (!target[index]) {
                     endLocator.parentNode.insertBefore(element, endLocator)
+
+                    if (options && options.after) {
+                        options.after([{
+                            type: ['add', 'block'].join('_'),
+                            target: element
+                        }])
+                    }
 
                     event.target.push(element)
                     return
@@ -210,6 +307,21 @@ define(
                 // 节点类型有变化，替换之
                 if (element.nodeType !== target[index].nodeType) {
                     target[index].parentNode.insertBefore(element, target[index])
+
+                    if (options && options.after) {
+                        options.after([{
+                            type: ['add', 'block'].join('_'),
+                            target: element
+                        }])
+                    }
+
+                    if (options && options.before) {
+                        options.before([{
+                            type: ['delete', 'block'].join('_'),
+                            target: target[index]
+                        }])
+                    }
+
                     target[index].parentNode.removeChild(target[index])
 
                     event.target.push(element)
@@ -217,20 +329,60 @@ define(
                 }
                 // 同是文本节点，则更新节点值
                 if (element.nodeType === 3 && element.nodeValue !== target[index].nodeValue) {
+
+                    if (options && options.before) {
+                        options.before([{
+                            type: ['update', 'text'].join('_'),
+                            target: target[index]
+                        }])
+                    }
+
                     target[index].nodeValue = element.nodeValue
+
+                    if (options && options.after) {
+                        options.after([{
+                            type: ['update', 'text'].join('_'),
+                            target: target[index]
+                        }])
+                    }
+
                     return
                 }
                 // 同是注释节点，则更新节点值
                 if (element.nodeType === 8 && element.nodeValue !== target[index].nodeValue) {
+
+                    options.before([{
+                        type: ['update', 'text'].join('_'),
+                        target: target[index]
+                    }])
+
                     target[index].nodeValue = element.nodeValue
+
+                    options.after([{
+                        type: ['update', 'text'].join('_'),
+                        target: target[index]
+                    }])
+
                     return
                 }
                 // 同是 DOM 元素，则检测属性 outerHTML 是否相等，不相等则替换之
                 if (element.nodeType === 1) {
                     // $(target[index]).removeClass('transition highlight')
                     if (element.outerHTML !== target[index].outerHTML) {
+
+                        options.before([{
+                            type: ['add', 'block'].join('_'),
+                            target: element
+                        }])
+
                         target[index].parentNode.insertBefore(element, target[index])
+
                         target[index].parentNode.removeChild(target[index])
+
+                        options.before([{
+                            type: ['delete', 'block'].join('_'),
+                            target: target[index]
+                        }])
 
                         event.target.push(element)
                         return

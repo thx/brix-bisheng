@@ -74,14 +74,26 @@ define(
                     data.title = 'bar'
 
             */
-            bind: function bind(data, tpl, callback, context) {
-                // BiSheng.bind(data, tpl, context)
-                if (arguments.length === 3 && typeof callback !== 'function') {
-                    context = callback
-                    callback = function(content) {
-                        $(context).append(content)
+            bind: function bind(data, tpl, options, context) {
+                // BiSheng.bind(data, tpl, callback, context)
+                if (typeof options === 'function') {
+                    options = {
+                        resolve: options
                     }
                 }
+
+                // BiSheng.bind(data, tpl, context)
+                if (arguments.length === 3 &&
+                    (options.nodeType || options.length)) {
+                    context = options
+                    options = {
+                        resolve: function(content) {
+                            $(context).append(content)
+                        }
+                    }
+                }
+
+                if (!options) options = {}
 
                 // 属性监听函数
                 function task(changes) {
@@ -89,7 +101,7 @@ define(
                         var event = {
                             target: []
                         }
-                        Flush.handle(event, change, clone, context)
+                        Flush.handle(event, change, clone, context, options)
                         if (location.href.indexOf('scrollIntoView') > -1) Flush.scrollIntoView(event, data)
                         if (location.href.indexOf('highlight') > -1) Flush.highlight(event, data)
                     })
@@ -125,8 +137,8 @@ define(
                     如果 callback() 有返回值，则作为 BiSheng.bind() 的返回值返回，即优先返回 callback() 的返回值；
                     如果未传入 callback，则返回 content，因为不返回 content 的话，content 就会被丢弃。
                 */
-                return callback ?
-                    callback.call(data, content) || content :
+                return options.resolve ?
+                    options.resolve.call(data, content) || content :
                     content
             },
 
