@@ -60,10 +60,19 @@
                 resolve: function(content){
                     $('.container').append(content)
                 },
+                // type 
+                // add delete update
+                // text attribute block
                 before: function(changes){
+                    _.each(changes, function(item, index){
+                       Loader.destrop( item.target ) 
+                    }) 
                     console.log('before', changes)
                 },
                 after: function(changes){
+                    _.each(changes, function(item, index){
+                       Loader.boot( item.target ) 
+                    })
                     console.log('after ', changes)
                 }
             })

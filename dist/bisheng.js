@@ -1272,7 +1272,7 @@ define(
                 return $0.replace(/(>)([\w\W]*?)(<)/g, function(_, $1, $2, $3) {
                     if ($2.indexOf('&lt;') > -1) {
                         var re = ''
-                        HTML.convert($2).contents()._each(function(node /*, index*/ ) {
+                        HTML.convert($2).contents().each(function(index, node) {
                             re += node.nodeValue
                         })
                         return $1 + re + $3
@@ -1416,6 +1416,28 @@ define(
 
                 $(target).remove()
 
+                if (options && options.after) {
+                    options.after(
+                        _.map(target, function(item, index) {
+                            return {
+                                type: ['delete', 'block'].join('_'),
+                                target: item
+                            }
+                        })
+                    )
+                }
+
+                if (options && options.before) {
+                    options.before(
+                        _.map(content, function(item, index) {
+                            return {
+                                type: ['add', 'block'].join('_'),
+                                target: item
+                            }
+                        })
+                    )
+                }
+
                 /* jshint unused: false */
                 content = HTML.convert(content).contents()
                     .insertAfter(locator)
@@ -1548,7 +1570,14 @@ define(
                 $(target).remove()
 
                 if (options && options.after) {
-                    options.after([])
+                    options.after(
+                        _.map(target, function(item, index) {
+                            return {
+                                type: ['delete', 'block'].join('_'),
+                                target: item
+                            }
+                        })
+                    )
                 }
 
                 return
@@ -1574,11 +1603,31 @@ define(
                 }
 
                 toRemote.remove()
+
+                if (options && options.after) {
+                    options.after(
+                        _.map(toRemote, function(item, index) {
+                            return {
+                                type: ['delete', 'block'].join('_'),
+                                target: item
+                            }
+                        })
+                    )
+                }
+
             }
 
             content.each(function(index, element) {
                 // 新增节点
                 if (!target[index]) {
+
+                    if (options && options.before) {
+                        options.before([{
+                            type: ['add', 'block'].join('_'),
+                            target: element
+                        }])
+                    }
+
                     endLocator.parentNode.insertBefore(element, endLocator)
 
                     if (options && options.after) {
@@ -1593,6 +1642,14 @@ define(
                 }
                 // 节点类型有变化，替换之
                 if (element.nodeType !== target[index].nodeType) {
+
+                    if (options && options.before) {
+                        options.before([{
+                            type: ['add', 'block'].join('_'),
+                            target: element
+                        }])
+                    }
+
                     target[index].parentNode.insertBefore(element, target[index])
 
                     if (options && options.after) {
@@ -1610,6 +1667,13 @@ define(
                     }
 
                     target[index].parentNode.removeChild(target[index])
+
+                    if (options && options.after) {
+                        options.after([{
+                            type: ['delete', 'block'].join('_'),
+                            target: target[index]
+                        }])
+                    }
 
                     event.target.push(element)
                     return
@@ -1638,17 +1702,21 @@ define(
                 // 同是注释节点，则更新节点值
                 if (element.nodeType === 8 && element.nodeValue !== target[index].nodeValue) {
 
-                    options.before([{
-                        type: ['update', 'text'].join('_'),
-                        target: target[index]
-                    }])
+                    if (options && options.before) {
+                        options.before([{
+                            type: ['update', 'text'].join('_'),
+                            target: target[index]
+                        }])
+                    }
 
                     target[index].nodeValue = element.nodeValue
 
-                    options.after([{
-                        type: ['update', 'text'].join('_'),
-                        target: target[index]
-                    }])
+                    if (options && options.after) {
+                        options.after([{
+                            type: ['update', 'text'].join('_'),
+                            target: target[index]
+                        }])
+                    }
 
                     return
                 }
@@ -1657,19 +1725,37 @@ define(
                     // $(target[index]).removeClass('transition highlight')
                     if (element.outerHTML !== target[index].outerHTML) {
 
-                        options.before([{
-                            type: ['add', 'block'].join('_'),
-                            target: element
-                        }])
+                        if (options && options.before) {
+                            options.before([{
+                                type: ['add', 'block'].join('_'),
+                                target: element
+                            }])
+                        }
 
                         target[index].parentNode.insertBefore(element, target[index])
 
+                        if (options && options.after) {
+                            options.after([{
+                                type: ['add', 'block'].join('_'),
+                                target: element
+                            }])
+                        }
+
+                        if (options && options.before) {
+                            options.before([{
+                                type: ['delete', 'block'].join('_'),
+                                target: target[index]
+                            }])
+                        }
+
                         target[index].parentNode.removeChild(target[index])
 
-                        options.before([{
-                            type: ['delete', 'block'].join('_'),
-                            target: target[index]
-                        }])
+                        if (options && options.after) {
+                            options.after([{
+                                type: ['delete', 'block'].join('_'),
+                                target: target[index]
+                            }])
+                        }
 
                         event.target.push(element)
                         return

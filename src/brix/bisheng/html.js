@@ -67,7 +67,7 @@ define(
                 return $0.replace(/(>)([\w\W]*?)(<)/g, function(_, $1, $2, $3) {
                     if ($2.indexOf('&lt;') > -1) {
                         var re = ''
-                        HTML.convert($2).contents()._each(function(node /*, index*/ ) {
+                        HTML.convert($2).contents().each(function(index, node) {
                             re += node.nodeValue
                         })
                         return $1 + re + $3
