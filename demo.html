@@ -29,6 +29,7 @@
     </script>
     
     <script id="hello" type="template">
+        <div class="{{getFavorSelected curTab}}">{{getFavorSelected curTab}}</div>
         <div class="form-group">
             <p><input value="{{title}}"></p>
             <ul>
@@ -45,11 +46,27 @@
 
 
     <script type="text/javascript">
-        require(['jquery', 'brix/bisheng'], function($, BS) {
+        require(['jquery', 'handlebars', 'brix/bisheng'], function($, Handlebars, BS) {
+
+            Handlebars.registerHelper('getFavorSelected', function(curTab) {
+                var flag = '';
+                var curTabStr = curTab.toString();
+                if (curTabStr == 'favor') {
+                    flag = 'selected'
+                }
+                return flag;
+            });
+
             window.BS = BS
             BS.auto(true)
             var tpl = $('#hello').html()
+            // console.log(
+            //     JSON.stringify(
+            //         Handlebars.parse(tpl), null, 4
+            //     )
+            // )
             data = {
+                curTab: 'favor',
                 title: 'title',
                 list: [
                     { id: 1 },

@@ -6,7 +6,7 @@
         slot: 'start/end',
         type: 'text/attribute/block',
         path: '{{$lastest ' + prop + '}}',
-        isHelper: !! node.isHelper,
+        ishelper: !! node.isHelper,
         helper: helper
     }
 */
@@ -63,7 +63,12 @@ define(
             },
             // Scanner 解析占位符
             parse: function parse(locator, attr) {
-                return $(locator).attr(attr)
+                var value = $(locator).attr(attr)
+                if (attr === 'ishelper') {
+                    if (value === 'true') value = true
+                    if (value === 'false') value = false
+                }
+                return value
             },
             // Scanner 更新占位符
             update: function update(locator, attrs, force) {

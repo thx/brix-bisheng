@@ -84,9 +84,15 @@ define(
         */
         handle.text = function text(locator, event, change, defined, options) {
             var guid = Locator.parse(locator, 'guid')
-            var helper = Locator.parse(locator, 'helper')
+            var helper = Locator.parse(locator, 'ishelper')
             var target = Locator.parseTarget(locator)
             var content
+
+            if (helper === 'true' || helper === true) {
+                content = Handlebars.compile(defined.$helpers[guid])(change.context)
+            } else {
+                content = change.value
+            }
 
             // TextNode
             if (target.length === 1 && target[0].nodeType === 3) {
@@ -99,7 +105,7 @@ define(
                     }])
                 }
 
-                target[0].nodeValue = change.value
+                target[0].nodeValue = content
 
                 if (options && options.after) {
                     options.after([{
@@ -110,7 +116,7 @@ define(
 
             } else {
                 // Element
-                if (helper === 'true') {
+                if (helper === 'true' || helper === true) {
                     content = Handlebars.compile(defined.$helpers[guid])(change.context)
                 } else {
                     content = change.value
@@ -118,7 +124,7 @@ define(
 
                 if (options && options.before) {
                     options.before(
-                        _.map(target, function(item, index) {
+                        _.map(target, function(item /*, index*/ ) {
                             return {
                                 type: ['delete', 'block'].join('_'),
                                 target: item
@@ -131,7 +137,7 @@ define(
 
                 if (options && options.after) {
                     options.after(
-                        _.map(target, function(item, index) {
+                        _.map(target, function(item /*, index*/ ) {
                             return {
                                 type: ['delete', 'block'].join('_'),
                                 target: item
@@ -142,7 +148,7 @@ define(
 
                 if (options && options.before) {
                     options.before(
-                        _.map(content, function(item, index) {
+                        _.map(content, function(item /*, index*/ ) {
                             return {
                                 type: ['add', 'block'].join('_'),
                                 target: item
@@ -173,13 +179,16 @@ define(
 
         // 更新属性对应的 Expression
         handle.attribute = function attribute(path, event, change, defined, options) {
+            var guid = Locator.parse(path, 'guid')
+            var helper = Locator.parse(path, 'ishelper')
+
             var currentTarget, name, $target;
             event.target.push(currentTarget = Locator.parseTarget(path)[0])
             $target = $(currentTarget)
 
             if (options && options.before) {
                 options.before(
-                    _.map($target, function(item, index) {
+                    _.map($target, function(item /*, index*/ ) {
                         return {
                             type: ['update', 'attribute'].join('_'),
                             target: item
@@ -188,15 +197,29 @@ define(
                 )
             }
 
-            var ast = defined.$blocks[Locator.parse(path, 'guid')]
-            var value = ast ? Handlebars.compile(ast)(change.context) : change.value
-            var oldValue = function() {
-                var oldValue
-                var context = Loop.clone(change.context, true, change.path.slice(0, -1)) // TODO
-                context[change.path[change.path.length - 1]] = change.oldValue !== undefined ? change.oldValue.valueOf() : change.oldValue
-                oldValue = ast ? Handlebars.compile(ast)(context) : change.oldValue
-                return oldValue
-            }()
+            var value, oldValue
+            if (helper === 'true' || helper === true) {
+                value = Handlebars.compile(defined.$helpers[guid])(change.context)
+                oldValue = function() {
+                    var oldValue
+                    var context = Loop.clone(change.context, true, change.path.slice(0, -1)) // TODO
+                    context[change.path[change.path.length - 1]] = change.oldValue !== undefined ? change.oldValue.valueOf() : change.oldValue
+                    oldValue = Handlebars.compile(defined.$helpers[guid])(context)
+                    return oldValue
+                }()
+
+            } else {
+                var ast = defined.$blocks[Locator.parse(path, 'guid')]
+                value = ast ? Handlebars.compile(ast)(change.context) : change.value
+                oldValue = function() {
+                    var oldValue
+                    var context = Loop.clone(change.context, true, change.path.slice(0, -1)) // TODO
+                    context[change.path[change.path.length - 1]] = change.oldValue !== undefined ? change.oldValue.valueOf() : change.oldValue
+                    oldValue = ast ? Handlebars.compile(ast)(context) : change.oldValue
+                    return oldValue
+                }()
+            }
+
 
             name = Locator.parse(path, 'name')
             switch (name) {
@@ -247,7 +270,6 @@ define(
 
         // 更新数组对应的 Block，路径 > guid > Block
         handle.block = function block(locator, event, change, defined, options) {
-            if (!options) debugger
             var guid = Locator.parse(locator, 'guid')
             var ast = defined.$blocks[guid]
             var context = Loop.clone(change.context, true, change.path.slice(0, -1)) // TODO
@@ -271,7 +293,7 @@ define(
 
                 if (options && options.before) {
                     options.before(
-                        _.map(target, function(item, index) {
+                        _.map(target, function(item /*, index*/ ) {
                             return {
                                 type: ['delete', 'block'].join('_'),
                                 target: item
@@ -284,7 +306,7 @@ define(
 
                 if (options && options.after) {
                     options.after(
-                        _.map(target, function(item, index) {
+                        _.map(target, function(item /*, index*/ ) {
                             return {
                                 type: ['delete', 'block'].join('_'),
                                 target: item
@@ -306,7 +328,7 @@ define(
 
                 if (options && options.before) {
                     options.before(
-                        _.map(toRemote, function(item, index) {
+                        _.map(toRemote, function(item /*, index*/ ) {
                             return {
                                 type: ['delete', 'block'].join('_'),
                                 target: item
@@ -319,7 +341,7 @@ define(
 
                 if (options && options.after) {
                     options.after(
-                        _.map(toRemote, function(item, index) {
+                        _.map(toRemote, function(item /*, index*/ ) {
                             return {
                                 type: ['delete', 'block'].join('_'),
                                 target: item

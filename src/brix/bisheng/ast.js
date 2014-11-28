@@ -11,7 +11,7 @@
     * AST.mustache(node, context, index, blocks, helpers)
         为表达式插入定位符。
     * AST.block(node, context, index, blocks, helpers)
-        为逻辑块插入定位符
+        为逻辑块插入定位符。
 
 */
 define(
@@ -99,7 +99,7 @@ define(
                     slot: '',
                     type: 'text',
                     path: '{{$lastest ' + prop + '}}',
-                    isHelper: !!node.isHelper
+                    ishelper: !!node.isHelper
                 }
                 var placeholder
                 var statements

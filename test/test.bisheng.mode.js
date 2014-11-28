@@ -32,7 +32,7 @@ describe('Run Mode', function() {
         })
     })
 
-    it('Manual & Synchronous', function() { // 
+    it('Manual & Synchronous', function() {
         var data = {}
         var task = function() {
             data.foo = 123
@@ -53,7 +53,6 @@ describe('Run Mode', function() {
             })
             .unwatch(data)
             .auto(true)
-
     })
 
     it('Automatic & Asynchronous', function(done) {
@@ -73,6 +72,5 @@ describe('Run Mode', function() {
             done()
         })
         task()
-
     })
 })
