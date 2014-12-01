@@ -12,8 +12,13 @@
     "**/.*",
     "node_modules",
     "bower_components",
+    "src",
     "test",
-    "tests"
+    "tests",
+    "doc",
+    "demo",
+    "demo.html",
+    "gulpfile.js"
   ],
   "dependencies": {
     "jquery": "~2.1.1",
