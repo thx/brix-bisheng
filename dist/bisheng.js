@@ -496,7 +496,7 @@ define(
                             type: TYPES.UPDATE,
                             path: path.concat(name),
                             value: value,
-                            oldValue: oldValue[name] !== undefined ? oldValue[name].valueOf() : oldValue[name]
+                            oldValue: (oldValue[name] !== undefined && oldValue[name] !== null) ? oldValue[name].valueOf() : oldValue[name]
                         })
                         continue
                     }
@@ -644,7 +644,7 @@ define(
                     }
                 }
                 return $(target)
-            },
+            }
         }
 
         // comment 定位符
@@ -1568,7 +1568,7 @@ define(
             var content = Handlebars.compile(ast)(context)
 
             content = HTML.convert(content)
-            Scanner.scan(content[0], change.context)
+            Scanner.scan(content[0], change.root)
             content = content.contents()
 
             var target = Locator.parseTarget(locator)

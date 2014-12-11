@@ -103,7 +103,7 @@ define(
                     }
                 }
                 return $(target)
-            },
+            }
         }
 
         // comment 定位符

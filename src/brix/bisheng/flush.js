@@ -276,7 +276,7 @@ define(
             var content = Handlebars.compile(ast)(context)
 
             content = HTML.convert(content)
-            Scanner.scan(content[0], change.context)
+            Scanner.scan(content[0], change.root)
             content = content.contents()
 
             var target = Locator.parseTarget(locator)

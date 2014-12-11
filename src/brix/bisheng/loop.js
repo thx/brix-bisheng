@@ -495,7 +495,7 @@ define(
                             type: TYPES.UPDATE,
                             path: path.concat(name),
                             value: value,
-                            oldValue: oldValue[name] !== undefined ? oldValue[name].valueOf() : oldValue[name]
+                            oldValue: (oldValue[name] !== undefined && oldValue[name] !== null) ? oldValue[name].valueOf() : oldValue[name]
                         })
                         continue
                     }
