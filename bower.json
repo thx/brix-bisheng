@@ -7,6 +7,9 @@
   "moduleType": [
     "amd"
   ],
+  "main": [
+    "dist/bisheng.js"
+  ],
   "license": "MIT",
   "ignore": [
     "**/.*",
