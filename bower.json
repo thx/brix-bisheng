@@ -24,7 +24,7 @@
     "gulpfile.js"
   ],
   "dependencies": {
-    "jquery": "~2.1.1",
+    "jquery": "1.x.x",
     "handlebars": "~2.0.0",
     "underscore": "~1.7.0"
   }
