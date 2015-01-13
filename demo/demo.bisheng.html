@@ -16,7 +16,7 @@
 </head>
 <body>
     <!-- Include RequireJS -->
-    <script src="test/bower_components/requirejs/require.js"></script>
+    <script src="./bower_components/requirejs/require.js"></script>
     <script type="text/javascript">
         require.config({
             paths: {
@@ -27,10 +27,105 @@
             }
         })
     </script>
+    <script src="fb.js"></script>
     
+    <script id="hello" type="template">
+        <div class="{{getFavorSelected curTab}}">{{getFavorSelected curTab}}</div>
+
+        <div class="row">
+            <div class="col-sm-6">
+                <form class="form-horizontal">
+                    {{#each list}}
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">{{id}}</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" value="{{id}}">
+                        </div>
+                    </div>
+                    {{/each}}
+                </form>
+            </div>
+            <div class="col-sm-6">
+                <table class="table table-bordered">
+                    <caption>Optional table caption.</caption>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Username</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each list}}
+                        <tr>
+                            <th scope="row">{{id}}</th>
+                            <td>{{id}}</td>
+                            <td>{{id}}</td>
+                            <td>{{id}}</td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </script>
+    <script id="checked" type="template">
+        <input type="checkbox" checked="checked" style="color: #333;">
+        <img  src="./">
+    </script>
+
+    <div class="container"></div>
+
     <script type="text/javascript">
-        require(['jquery', 'brix/bisheng'], function($, BS) {
-            
+        require(['jquery', 'handlebars', 'brix/bisheng'], function($, Handlebars, BS) {
+
+            Handlebars.registerHelper('getFavorSelected', function(curTab) {
+                var flag = '';
+                var curTabStr = curTab.toString();
+                if (curTabStr == 'favor') {
+                    flag = 'selected'
+                }
+                return flag;
+            });
+
+            window.BS = BS
+            // BS.auto(true)
+            var tpl = $('#hello').html()
+            // console.log(
+            //     JSON.stringify(
+            //         Handlebars.parse(tpl), null, 4
+            //     )
+            // )
+            data = {
+                curTab: 'favor',
+                title: 'title',
+                list: []
+            }
+            for (var i = 0; i < 10; i++) {
+                data.list.push({
+                    id: i
+                })
+            }
+            data.fbdata = fbdata
+
+            BS.bind(data, tpl, function(content){
+                $('.container').append(content)
+            })
+            /*BS.bind(data, tpl, {
+                resolve: function(content){
+                    $('.container').append(content)
+                },
+                // type 
+                // add delete update
+                // text attribute block
+                before: function(changes){
+                    console.log('before', changes)
+                },
+                after: function(changes){
+                    console.log('after ', changes)
+                }
+            })*/
         })
     </script>
 

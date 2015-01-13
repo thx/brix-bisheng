@@ -15,6 +15,7 @@ define(
     ) {
 
         var guid = 1
+        var DEBUG = ~location.search.indexOf('debug')
 
         return {
             version: '0.1.1',

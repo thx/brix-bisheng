@@ -34,7 +34,7 @@
             <p><input value="{{title}}"></p>
             <ul>
             {{#each list}}
-                <li>{{id}}</li>
+                <li>{{id}} <input value="{{id}}"></li>
             {{/each}}
             </ul>
             <br>
@@ -68,11 +68,12 @@
             data = {
                 curTab: 'favor',
                 title: 'title',
-                list: [
-                    { id: 1 },
-                    { id: 2 },
-                    { id: 3 }
-                ]
+                list: []
+            }
+            for (var i = 0; i < 100; i++) {
+                data.list.push({
+                    id: i
+                })
             }
             BS.bind(data, tpl, {
                 resolve: function(content){

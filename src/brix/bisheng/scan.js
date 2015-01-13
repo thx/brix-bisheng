@@ -76,7 +76,10 @@ define(
                 name: 'checked',
                 setup: function() {},
                 teardown: function(node, value) {
-                    if (value === 'true') $(node).attr('checked', 'checked')
+                    if (value === 'true' || value === 'checked') {
+                        $(node).attr('checked', 'checked')
+                            .prop('checked', true)
+                    }
                 }
             }
         };
@@ -105,7 +108,7 @@ define(
                 function(attributeNode /*, index*/ ) {
 
                     var nodeName = attributeNode.nodeName,
-                        nodeValue = attributeNode.nodeValue,
+                        nodeValue = attributeNode.value, // nodeValue
                         ma, stylema, hook;
 
                     nodeName = nodeName.toLowerCase()
