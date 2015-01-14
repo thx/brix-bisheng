@@ -74,8 +74,32 @@
         <input type="checkbox" checked="checked" style="color: #333;">
         <img  src="./">
     </script>
+    <script id="radio" type="template">
+        {{#with a.b}}
+        <form>
+        <div class="radio">
+            <label>
+                <input type="radio" name="optionsRadios" value="{{radioValue1}}" checked="{{radioChecked1}}">
+                Option one is this and that&mdash;be sure to include why it's great
+            </label>
+        </div>
+        <div class="radio">
+            <label>
+                <input type="radio" name="optionsRadios" value="{{radioValue2}}" checked="{{radioChecked2}}">
+                Option two can be something else and selecting it will deselect option one
+            </label>
+        </div>
+        <p>
+            {{optionsRadios}}
+        </p>
+        </form>
+        {{/with}}
+    </script>
+    <script id="input" type="template">
+        <input value="{{optionsRadios}}">
+    </script>
 
-    <div class="container"></div>
+    <div class="container" style="margin-top: 30px;"></div>
 
     <script type="text/javascript">
         require(['jquery', 'handlebars', 'brix/bisheng'], function($, Handlebars, BS) {
@@ -91,7 +115,7 @@
 
             window.BS = BS
             // BS.auto(true)
-            var tpl = $('#hello').html()
+            var tpl = $('#input').html()
             // console.log(
             //     JSON.stringify(
             //         Handlebars.parse(tpl), null, 4
@@ -100,7 +124,17 @@
             data = {
                 curTab: 'favor',
                 title: 'title',
-                list: []
+                list: [],
+                optionsRadios: '',
+                a: {
+                    b: {
+                        optionsRadios: '',
+                        radioValue1: 0,
+                        radioValue2: 1,
+                        radioChecked1: true,
+                        radioChecked2: false,
+                    }
+                }
             }
             for (var i = 0; i < 10; i++) {
                 data.list.push({
@@ -109,10 +143,10 @@
             }
             data.fbdata = fbdata
 
-            BS.bind(data, tpl, function(content){
-                $('.container').append(content)
-            })
-            /*BS.bind(data, tpl, {
+            // BS.bind(data, tpl, function(content){
+            //     $('.container').append(content)
+            // })
+            BS.bind(data, tpl, {
                 resolve: function(content){
                     $('.container').append(content)
                 },
@@ -125,7 +159,7 @@
                 after: function(changes){
                     console.log('after ', changes)
                 }
-            })*/
+            })
         })
     </script>
 

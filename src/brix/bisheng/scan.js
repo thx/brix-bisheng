@@ -110,6 +110,7 @@ define(
                     var nodeName = attributeNode.nodeName,
                         nodeValue = attributeNode.value, // nodeValue
                         ma, stylema, hook;
+                        // 'Attr.nodeValue' is deprecated. Please use 'value' instead.
 
                     nodeName = nodeName.toLowerCase()
                     hook = AttributeHooks[nodeName]
@@ -148,7 +149,8 @@ define(
 
                     if (attributes.length) {
                         nodeValue = nodeValue.replace(reph, '')
-                        attributeNode.nodeValue = nodeValue
+                        // attributeNode.nodeValue = nodeValue // 'Attr.nodeValue' is deprecated. Please use 'value' instead.
+                        attributeNode.value = nodeValue
                         _.each(attributes, function(elem /*, index*/ ) {
                             var slot = Locator.parse(elem, 'slot')
                             if (slot === 'start') $(node).before(elem)

@@ -485,6 +485,7 @@ define(
 
                     if (!(name in oldValue)) continue
                     if (value === undefined && oldValue[name] === undefined) continue
+                    if (value === null && oldValue[name] === null) continue
 
                     if (value === undefined ||
                         value === null ||
