@@ -341,4 +341,141 @@ describe('Block', function() {
         bindThenCheck(data, tpl, task, expected, done, before)
     })
 
+    it('nested, add', function(done) {
+        var tpl = heredoc(function() {
+            /*
+<div class="comments {{#if comments}}hello{{/if}}">
+  {{#if comments.length}}
+  {{#each comments}}
+    <div class="comment">
+      <h2>{{subject}}</h2>
+      <span>{{{body}}}</span>
+    </div>
+  {{/each}}
+  {{/if}}
+  {{#unless comments}}
+    <h3 class="warning">WARNING: This entry does not have any records!</h3>
+  {{/unless}}
+</div>
+        */
+        })
+        var data = {
+            comments: [{
+                subject: 'subject' + Math.random(),
+                body: 'body' + Math.random()
+            }, {
+                subject: 'subject' + Math.random(),
+                body: 'body' + Math.random()
+            }, {
+                subject: 'subject' + Math.random(),
+                body: 'body' + Math.random()
+            }]
+        }
+        var task = function() {
+            data.comments.push({
+                subject: 'subject' + Math.random(),
+                body: 'body' + Math.random()
+            })
+        }
+        var expected = function(container) {
+            expect(container.find('div.comment')).to.have.length(4)
+            expect(container.find('div.comment:eq(3) h2').text()).to.equal(data.comments[3].subject)
+            expect(container.find('div.comment:eq(3) span').text()).to.equal(data.comments[3].body)
+            expect(container.find('h3')).to.have.length(0)
+        }
+        var before = function(container) {
+            expect(container.find('div.comment')).to.have.length(3)
+            expect(container.find('h3')).to.have.length(0)
+        }
+        bindThenCheck(data, tpl, task, expected, done, before)
+    })
+
+    it('nested, delete', function(done) {
+        var tpl = heredoc(function() {
+            /*
+<div class="comments {{#if comments}}hello{{/if}}">
+  {{#if comments.length}}
+  {{#each comments}}
+    <div class="comment">
+      <h2>{{subject}}</h2>
+      <span>{{{body}}}</span>
+    </div>
+  {{/each}}
+  {{/if}}
+  {{#unless comments}}
+    <h3 class="warning">WARNING: This entry does not have any records!</h3>
+  {{/unless}}
+</div>
+        */
+        })
+        var data = {
+            comments: [{
+                subject: 'subject' + Math.random(),
+                body: 'body' + Math.random()
+            }, {
+                subject: 'subject' + Math.random(),
+                body: 'body' + Math.random()
+            }, {
+                subject: 'subject' + Math.random(),
+                body: 'body' + Math.random()
+            }]
+        }
+        var task = function() {
+            data.comments.pop()
+        }
+        var expected = function(container) {
+            expect(container.find('div.comment')).to.have.length(2)
+            expect(container.find('h3')).to.have.length(0)
+        }
+        var before = function(container) {
+            expect(container.find('div.comment')).to.have.length(3)
+            expect(container.find('h3')).to.have.length(0)
+        }
+        bindThenCheck(data, tpl, task, expected, done, before)
+    })
+
+    it('nested, empty', function(done) {
+        var tpl = heredoc(function() {
+            /*
+<div class="comments {{#if comments}}hello{{/if}}">
+  {{#if comments.length}}
+  {{#each comments}}
+    <div class="comment">
+      <h2>{{subject}}</h2>
+      <span>{{{body}}}</span>
+    </div>
+  {{/each}}
+  {{/if}}
+  {{#unless comments}}
+    <h3 class="warning">WARNING: This entry does not have any records!</h3>
+  {{/unless}}
+</div>
+        */
+        })
+        var data = {
+            comments: [{
+                subject: 'subject' + Math.random(),
+                body: 'body' + Math.random()
+            }, {
+                subject: 'subject' + Math.random(),
+                body: 'body' + Math.random()
+            }, {
+                subject: 'subject' + Math.random(),
+                body: 'body' + Math.random()
+            }]
+        }
+        var task = function() {
+            data.comments = []
+        }
+        var expected = function(container) {
+            expect(container.find('div.comment')).to.have.length(0)
+            expect(container.find('h3')).to.have.length(1)
+        }
+        var before = function(container) {
+            expect(container.find('div.comment')).to.have.length(3)
+            expect(container.find('h3')).to.have.length(0)
+        }
+        bindThenCheck(data, tpl, task, expected, done, before)
+    })
+
 })

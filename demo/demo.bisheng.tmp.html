@@ -36,7 +36,6 @@
 
     <div class="container">
         <div id="demo" style="background-color:red"></div>
-        <div id="add">添加</div>
     </div>
 
     <script type="text/javascript">
@@ -64,6 +63,10 @@
                     scaleMax: 100
                 }
             }
+            setInterval(function(){
+              data.rate.scaleValue++
+              BS.apply()
+            }, 1000)
             BS.bind(data, tpl, function(content){
                 $('#demo').append(content)
             })
