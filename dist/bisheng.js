@@ -402,8 +402,8 @@ define(
                 updated(newObject, oldObject, path, result)
 
                 /*
-                root    完整的数据对象
-                context 变化的上下文，这里进行遍历计算以简化 Flush.js 对数据上下文的访问
+                    root    完整的数据对象
+                    context 变化的上下文，这里进行遍历计算以简化 Flush.js 对数据上下文的访问
                 */
                 function getContext(root, path) {
                     return function() {
@@ -421,6 +421,8 @@ define(
                         change.root = newObject
                         change.context = getContext(newObject, change.path)()
                         change.getContext = getContext
+                        
+                        change.shadow = oldObject
                     }
                 }
 
@@ -1391,7 +1393,6 @@ define(
                 slot: 'start',
                 path: change.path.join('.')
             }, context || document.body)
-            var type
 
             if ((change.type === 'delete' || change.type === 'add') && change.context instanceof Array) { /*paths.length === 0 && */
                 change.path.pop()
@@ -1401,6 +1402,21 @@ define(
                 return
             }
 
+            // 如果未找到对应的定位符，则试着向上查找
+            if (paths.length === 0) {
+                change.path.pop()
+
+                if (change.path <= 1) return
+
+                change.type = 'update'
+                change.value = change.context
+                change.context = change.getContext(change.root, change.path)()
+                change.oldValue = change.getContext(change.shadow, change.path)()
+                handle(event, change, defined, context, options)
+                return
+            }
+
+            var type
             _.each(paths, function(path /*, index*/ ) {
                 type = Locator.parse(path, 'type')
                 if (handle[type]) handle[type](path, event, change, defined, options)
@@ -1494,7 +1510,6 @@ define(
                     return oldValue
                 }()
             }
-
 
             name = Locator.parse(path, 'name')
             switch (name) {

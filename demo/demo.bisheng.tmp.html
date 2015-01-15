@@ -29,18 +29,13 @@
     </script>
 
     <script id="hello" type="template">
-        <label><input type="checkbox" checked="{{enabled}}" />启用</label>
-        {{#if enabled}}
-            {{#each list}}
-                <div>{{name}}</div>
-            {{/each}}
-            {{^if isMax}}
-            {{/if}}
-        {{/if}}
+        <div>
+            {{#rate rate}}{{/rate}}
+        </div>
     </script>
 
     <div class="container">
-        <div id="demo"style="background-color:red"></div>
+        <div id="demo" style="background-color:red"></div>
         <div id="add">添加</div>
     </div>
 
@@ -48,30 +43,30 @@
         require(['jquery', 'handlebars', 'brix/bisheng'], function($, Handlebars, BS) {
             window.BS = BS
             // BS.auto(true)
+            
+            Handlebars.registerHelper('rate', function(rate){
+                var tpl =     '<div class="rate editable-ipt">'
+                        +        '<div class="ipt-wrap">'
+                        +            '<input type="text" class="fui-text-s" value="' + rate.scaleValue + '" />%'
+                        +            '<div class="tip">输入范围：' + rate.scaleMin + '% - ' + rate.scaleMax + '%</div>'
+                        +        '</div>'
+                        +        '<i class="leo-icon leo-icon-edit"></i>'
+                        +    '</div>';
+
+                return tpl;
+            }); 
+
             var tpl = $('#hello').html()
             data = {
-                enabled: true,
-                list: [{
-                    name: 'A'
-                }, {
-                    name: 'AA'
-                }],
-                isMax: false
+                rate: {
+                    scaleValue: 5,
+                    scaleMin: 1,
+                    scaleMax: 100
+                }
             }
             BS.bind(data, tpl, function(content){
                 $('#demo').append(content)
             })
-            document.getElementById('add').onclick = function addItem() {
-                data.list.push({
-                    name: data.list[data.list.length - 1].name + 'A'
-                })
-
-                if (data.list.length > 5) {
-                    data.maxLength = true
-                }
-
-                BS.apply()
-            }
         })
     </script>
 

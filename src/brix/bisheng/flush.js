@@ -62,7 +62,6 @@ define(
                 slot: 'start',
                 path: change.path.join('.')
             }, context || document.body)
-            var type
 
             if ((change.type === 'delete' || change.type === 'add') && change.context instanceof Array) { /*paths.length === 0 && */
                 change.path.pop()
@@ -72,6 +71,21 @@ define(
                 return
             }
 
+            // 如果未找到对应的定位符，则试着向上查找
+            if (paths.length === 0) {
+                change.path.pop()
+
+                if (change.path <= 1) return
+
+                change.type = 'update'
+                change.value = change.context
+                change.context = change.getContext(change.root, change.path)()
+                change.oldValue = change.getContext(change.shadow, change.path)()
+                handle(event, change, defined, context, options)
+                return
+            }
+
+            var type
             _.each(paths, function(path /*, index*/ ) {
                 type = Locator.parse(path, 'type')
                 if (handle[type]) handle[type](path, event, change, defined, options)
@@ -165,7 +179,6 @@ define(
                     return oldValue
                 }()
             }
-
 
             name = Locator.parse(path, 'name')
             switch (name) {

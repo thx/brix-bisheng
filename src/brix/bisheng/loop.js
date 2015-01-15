@@ -401,8 +401,8 @@ define(
                 updated(newObject, oldObject, path, result)
 
                 /*
-                root    完整的数据对象
-                context 变化的上下文，这里进行遍历计算以简化 Flush.js 对数据上下文的访问
+                    root    完整的数据对象
+                    context 变化的上下文，这里进行遍历计算以简化 Flush.js 对数据上下文的访问
                 */
                 function getContext(root, path) {
                     return function() {
@@ -420,6 +420,8 @@ define(
                         change.root = newObject
                         change.context = getContext(newObject, change.path)()
                         change.getContext = getContext
+                        
+                        change.shadow = oldObject
                     }
                 }
 
