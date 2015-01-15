@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test: Brix Event </title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+        .transition {
+            transition: background-color 0.5s ease, width 0.5s ease, height 0.5s ease;
+        }
+        .highlight {
+            background-color: yellow;
+        }
+    </style>
+</head>
+<body>
+    <!-- Include RequireJS -->
+    <script src="./bower_components/requirejs/require.js"></script>
+    <script type="text/javascript">
+        require.config({
+            paths: {
+                'brix/bisheng': '../dist/bisheng',
+                jquery: 'bower_components/jquery/dist/jquery',
+                underscore: 'bower_components/underscore/underscore',
+                handlebars: 'bower_components/handlebars/handlebars'
+            }
+        })
+    </script>
+
+    <script id="hello" type="template">
+        <label><input type="checkbox" checked="{{enabled}}" />启用</label>
+        {{#if enabled}}
+            {{#each list}}
+                <div>{{name}}</div>
+            {{/each}}
+            {{^if isMax}}
+            {{/if}}
+        {{/if}}
+    </script>
+
+    <div class="container">
+        <div id="demo"style="background-color:red"></div>
+        <div id="add">添加</div>
+    </div>
+
+    <script type="text/javascript">
+        require(['jquery', 'handlebars', 'brix/bisheng'], function($, Handlebars, BS) {
+            window.BS = BS
+            // BS.auto(true)
+            var tpl = $('#hello').html()
+            data = {
+                enabled: true,
+                list: [{
+                    name: 'A'
+                }, {
+                    name: 'AA'
+                }],
+                isMax: false
+            }
+            BS.bind(data, tpl, function(content){
+                $('#demo').append(content)
+            })
+            document.getElementById('add').onclick = function addItem() {
+                data.list.push({
+                    name: data.list[data.list.length - 1].name + 'A'
+                })
+
+                if (data.list.length > 5) {
+                    data.maxLength = true
+                }
+
+                BS.apply()
+            }
+        })
+    </script>
+
+</body>
+</html>

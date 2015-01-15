@@ -97,6 +97,17 @@
     </script>
     <script id="input" type="template">
         <input value="{{optionsRadios}}">
+        {{optionsRadios}}
+    </script>
+    <script type="template">
+        <label><input type="checkbox" checked="{{enabled}}" />启用</label>
+        {{#if enabled}}
+            {{#each list}}
+                <div>{{name}}</div>
+            {{/each}}
+            {{^if isMax}}
+            {{/if}}
+        {{/if}}
     </script>
 
     <div class="container" style="margin-top: 30px;"></div>
@@ -115,7 +126,7 @@
 
             window.BS = BS
             // BS.auto(true)
-            var tpl = $('#input').html()
+            var tpl = $('#hello').html()
             // console.log(
             //     JSON.stringify(
             //         Handlebars.parse(tpl), null, 4
@@ -124,7 +135,9 @@
             data = {
                 curTab: 'favor',
                 title: 'title',
-                list: [],
+                list: [{
+                    name:'A'
+                }],
                 optionsRadios: '',
                 a: {
                     b: {
@@ -143,23 +156,23 @@
             }
             data.fbdata = fbdata
 
-            // BS.bind(data, tpl, function(content){
-            //     $('.container').append(content)
-            // })
-            BS.bind(data, tpl, {
-                resolve: function(content){
-                    $('.container').append(content)
-                },
-                // type 
-                // add delete update
-                // text attribute block
-                before: function(changes){
-                    console.log('before', changes)
-                },
-                after: function(changes){
-                    console.log('after ', changes)
-                }
+            BS.bind(data, tpl, function(content){
+                $('.container').append(content)
             })
+            // BS.bind(data, tpl, {
+            //     resolve: function(content){
+            //         $('.container').append(content)
+            //     },
+            //     // type 
+            //     // add delete update
+            //     // text attribute block
+            //     before: function(changes){
+            //         console.log('before', changes)
+            //     },
+            //     after: function(changes){
+            //         console.log('after ', changes)
+            //     }
+            // })
         })
     </script>
 

@@ -89,15 +89,29 @@ define(
             // Flush 解析目标节点
             parseTarget: function parseTarget(locator) {
                 var guid = $(locator).attr('guid')
-                var target = [],
-                    node = locator,
-                    $node
+                var target = []
+                var node = locator
+                var $node
                 while ((node = node.nextSibling)) {
                     $node = $(node)
                     if (node.nodeName.toLowerCase() === 'script' && $node.attr('guid')) {
-                        if ($node.attr('guid') === guid && $node.attr('slot') === 'end') {
-                            break
-                        }
+                        if ($node.attr('guid') === guid && $node.attr('slot') === 'end') break
+                    } else {
+                        target.push(node)
+                    }
+                }
+                return $(target)
+            },
+            between: function between(locator) {
+                var guid = $(locator).attr('guid')
+                var target = []
+                var node = locator
+                var $node
+                while ((node = node.nextSibling)) {
+                    $node = $(node)
+                    if (node.nodeName.toLowerCase() === 'script' && $node.attr('guid')) {
+                        if ($node.attr('guid') === guid && $node.attr('slot') === 'end') break
+                        else target.push(node)
                     } else {
                         target.push(node)
                     }
@@ -169,6 +183,21 @@ define(
                     if (node.nodeType === 8) {
                         var end = this.parse(node)
                         if (end.guid === json.guid && end.slot === 'end') break
+                    } else {
+                        target.push(node)
+                    }
+                }
+                return $(target)
+            },
+            between: function between(locator) {
+                var json = this.parse(locator)
+                var target = []
+                var node = locator
+                while ((node = node.nextSibling)) {
+                    if (node.nodeType === 8) {
+                        var end = this.parse(node)
+                        if (end.guid === json.guid && end.slot === 'end') break
+                        else target.push(node)
                     } else {
                         target.push(node)
                     }
