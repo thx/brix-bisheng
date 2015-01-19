@@ -31,7 +31,7 @@ define(
                 设置运行模式为自动检测（true）或手动触发检测（false）。
 
                 BiSheng.js 初始化时，会默认执行 BiSheng.auto(false)，即默认设置为手动触发检测，此时，在更新数据时，需要手动调用 BiSheng.apply(fn)。
-                如果希望自动检测，则执行 执行 BiSheng.auto(true)。
+                如果希望自动检测，则执行 BiSheng.auto(true)。
             */
             auto: function(bool) {
                 if (arguments.length) {

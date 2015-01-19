@@ -163,7 +163,7 @@ define(
                 oldValue = function() {
                     var oldValue
                     var context = Loop.clone(change.context, true, change.path.slice(0, -1)) // TODO
-                    context[change.path[change.path.length - 1]] = change.oldValue !== undefined ? change.oldValue.valueOf() : change.oldValue
+                    context[change.path[change.path.length - 1]] = (change.oldValue !== undefined && change.oldValue !== null) ? change.oldValue.valueOf() : change.oldValue
                     oldValue = Handlebars.compile(defined.$helpers[guid])(context)
                     return oldValue
                 }()
@@ -174,7 +174,7 @@ define(
                 oldValue = function() {
                     var oldValue
                     var context = Loop.clone(change.context, true, change.path.slice(0, -1)) // TODO
-                    context[change.path[change.path.length - 1]] = change.oldValue !== undefined ? change.oldValue.valueOf() : change.oldValue
+                    context[change.path[change.path.length - 1]] = (change.oldValue !== undefined && change.oldValue !== null) ? change.oldValue.valueOf() : change.oldValue
                     oldValue = ast ? Handlebars.compile(ast)(context) : change.oldValue
                     return oldValue
                 }()
@@ -230,7 +230,8 @@ define(
             Scanner.scan(content[0], change.root)
             content = content.contents()
 
-            var target = Locator.parseTarget(locator)
+            var target = Locator.between(locator) // https://github.com/thx/bisheng/issues/14 
+                // Locator.parseTarget(locator)
             var endLocator = Locator.find({
                 guid: guid,
                 slot: 'end'
@@ -251,7 +252,7 @@ define(
                 $(target).remove()
 
                 // 清空开始定位符和结束定位符之间的所有内容
-                Locator.between(locator).remove()
+                // Locator.between(locator).remove()
 
                 after(options, ['delete', 'block'], target)
 

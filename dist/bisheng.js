@@ -791,7 +791,7 @@ define(
 
         var ifHelper = Handlebars.helpers['if']
         Handlebars.registerHelper('if', function(conditional, options) {
-            return ifHelper.call(this, conditional !== undefined ? conditional.valueOf() : conditional, options)
+            return ifHelper.call(this, (conditional !== undefined && conditional !== null) ? conditional.valueOf() : conditional, options)
         })
 
         var blockHelperMissing = Handlebars.helpers.blockHelperMissing
@@ -1058,7 +1058,7 @@ define(
                     var nodeName = attributeNode.nodeName,
                         nodeValue = attributeNode.value, // nodeValue
                         ma, stylema, hook;
-                        // 'Attr.nodeValue' is deprecated. Please use 'value' instead.
+                    // 'Attr.nodeValue' is deprecated. Please use 'value' instead.
 
                     nodeName = nodeName.toLowerCase()
                     hook = AttributeHooks[nodeName]
@@ -1097,7 +1097,7 @@ define(
 
                     if (attributes.length) {
                         nodeValue = nodeValue.replace(reph, '')
-                        // attributeNode.nodeValue = nodeValue // 'Attr.nodeValue' is deprecated. Please use 'value' instead.
+                            // attributeNode.nodeValue = nodeValue // 'Attr.nodeValue' is deprecated. Please use 'value' instead.
                         attributeNode.value = nodeValue
                         _.each(attributes, function(elem /*, index*/ ) {
                             var slot = Locator.parse(elem, 'slot')
@@ -1494,7 +1494,7 @@ define(
                 oldValue = function() {
                     var oldValue
                     var context = Loop.clone(change.context, true, change.path.slice(0, -1)) // TODO
-                    context[change.path[change.path.length - 1]] = change.oldValue !== undefined ? change.oldValue.valueOf() : change.oldValue
+                    context[change.path[change.path.length - 1]] = (change.oldValue !== undefined && change.oldValue !== null) ? change.oldValue.valueOf() : change.oldValue
                     oldValue = Handlebars.compile(defined.$helpers[guid])(context)
                     return oldValue
                 }()
@@ -1505,7 +1505,7 @@ define(
                 oldValue = function() {
                     var oldValue
                     var context = Loop.clone(change.context, true, change.path.slice(0, -1)) // TODO
-                    context[change.path[change.path.length - 1]] = change.oldValue !== undefined ? change.oldValue.valueOf() : change.oldValue
+                    context[change.path[change.path.length - 1]] = (change.oldValue !== undefined && change.oldValue !== null) ? change.oldValue.valueOf() : change.oldValue
                     oldValue = ast ? Handlebars.compile(ast)(context) : change.oldValue
                     return oldValue
                 }()
@@ -1561,7 +1561,8 @@ define(
             Scanner.scan(content[0], change.root)
             content = content.contents()
 
-            var target = Locator.parseTarget(locator)
+            var target = Locator.between(locator) // https://github.com/thx/bisheng/issues/14 
+                // Locator.parseTarget(locator)
             var endLocator = Locator.find({
                 guid: guid,
                 slot: 'end'
@@ -1582,7 +1583,7 @@ define(
                 $(target).remove()
 
                 // 清空开始定位符和结束定位符之间的所有内容
-                Locator.between(locator).remove()
+                // Locator.between(locator).remove()
 
                 after(options, ['delete', 'block'], target)
 
@@ -1770,7 +1771,7 @@ define(
                 设置运行模式为自动检测（true）或手动触发检测（false）。
 
                 BiSheng.js 初始化时，会默认执行 BiSheng.auto(false)，即默认设置为手动触发检测，此时，在更新数据时，需要手动调用 BiSheng.apply(fn)。
-                如果希望自动检测，则执行 执行 BiSheng.auto(true)。
+                如果希望自动检测，则执行 BiSheng.auto(true)。
             */
             auto: function(bool) {
                 if (arguments.length) {

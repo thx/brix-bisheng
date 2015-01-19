@@ -7,13 +7,13 @@
 
         BiSheng.auto(false)
         BiSheng.apply(function() {
-            // data.foo = ...
+            data.foo = ...
         })
 
     * Automatic & Asynchronous
 
-        BiSheng.auto(false)
-        // data.foo = ...
+        BiSheng.auto(true)
+        data.foo = ...
 */
 describe('Run Mode', function() {
     this.timeout(1000)

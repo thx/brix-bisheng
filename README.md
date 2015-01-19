@@ -66,11 +66,11 @@ require(['jquery', 'brix/bisheng'], function($, BiSheng){
 **参数的含义和默认值**如下所示：
 
 * `data` 必选。待绑定的对象或数组。
-* `tpl` 必选。待绑定的 HTML 模板。在绑定过程中，先把 HTML 模板转换为 DOM 元素，然后将“绑定”数据到 DOM 元素。目前只支持 Handlebars.js 语法。
-* `callback( content )` 必选。回调函数，当绑定完成后被执行。执行该函数时，会把转换后的 DOM 元素作为参数 content 传入。该函数的上下文（即关键字 this）是参数 data。
+* `tpl` 必选。待绑定的 HTML 模板。在绑定过程中，会先把 HTML 模板转换为 DOM 元素，然后将数据“绑定”到 DOM 元素。目前只支持 Handlebars.js 语法。
+* `callback( content )` 必选。回调函数，当绑定完成后被执行。执行该函数时，会把转换后的 DOM 元素作为参数 `content` 传入。该函数的上下文（即关键字 `this`）是参数 `data`。
     * `content` 数组，其中包含了转换后的 DOM 元素。
-* `context` 可选。容器元素，可以是单个  DOM 元素，或 DOM 元素数组，或选择器表达式。转换后的 DOM 元素将被插入该参数中。
-* `options` 可选。对象，其中包含了三种回调函数：`resolve`、`before`、`after`，格式为：
+* `context` 可选。容器元素，可以是单个 DOM 元素，或 DOM 元素数组，或选择器表达式。转换后的 DOM 元素将被插入该参数中。
+* `options` 可选。对象，其中可以包含三种回调函数：`resolve`、`before`、`after`，格式为：
 
     ```js
     {

@@ -30,42 +30,37 @@
 
     <script id="hello" type="template">
         <div>
-            {{#rate rate}}{{/rate}}
+            {{#each list}}
+                <input value="{{title}}">
+            {{/each}}
         </div>
+
+        <ul>
+        {{#each list}}
+            <li>
+            {{#if title}} {{title}} {{/if}}
+            {{#unless title}} todo {{/unless}}
+            </li>
+        {{/each}}
+        </ul>
     </script>
 
     <div class="container">
-        <div id="demo" style="background-color:red"></div>
+        <div id="demo"></div>
     </div>
 
     <script type="text/javascript">
         require(['jquery', 'handlebars', 'brix/bisheng'], function($, Handlebars, BS) {
             window.BS = BS
             // BS.auto(true)
-            
-            Handlebars.registerHelper('rate', function(rate){
-                var tpl =     '<div class="rate editable-ipt">'
-                        +        '<div class="ipt-wrap">'
-                        +            '<input type="text" class="fui-text-s" value="' + rate.scaleValue + '" />%'
-                        +            '<div class="tip">输入范围：' + rate.scaleMin + '% - ' + rate.scaleMax + '%</div>'
-                        +        '</div>'
-                        +        '<i class="leo-icon leo-icon-edit"></i>'
-                        +    '</div>';
-
-                return tpl;
-            }); 
-
             var tpl = $('#hello').html()
             data = {
-                rate: {
-                    scaleValue: 5,
-                    scaleMin: 1,
-                    scaleMax: 100
-                }
+                list: [{
+                    title: Math.random()
+                }]
             }
             setInterval(function(){
-              data.rate.scaleValue++
-              BS.apply()
+              // BS.apply()
             }, 1000)
             BS.bind(data, tpl, function(content){
                 $('#demo').append(content)
