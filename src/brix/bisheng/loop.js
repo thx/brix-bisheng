@@ -25,30 +25,36 @@ define(
 
         // 运行模式
 
-        var AUTO = false;
+        var AUTO = false
+        var DURATION = 50
 
         function auto(bool) {
             if (bool === undefined) return AUTO
 
             AUTO = !!bool
-            if (AUTO) timerId = setTimeout(letMeSee, 50)
+            if (AUTO) timerId = setTimeout(letMeSee, DURATION)
             else clearTimeout(timerId)
         }
 
         // 执行任务
 
         var tasks = []
-        var timerId;
+        var timerId
         tasks.__index = 0 // TODO 记录双向绑定任务的插入位置
 
-        function letMeSee() {
+        function letMeSee(data, tpl) {
             clearTimeout(timerId)
-            for (var i = 0; i < tasks.length; i++) {
-                if (tasks[i]) tasks[i]()
+            for (var i = 0, task; i < tasks.length; i++) {
+                task = tasks[i]
+                if (!task) continue
+                if (data !== undefined && task.data !== data) continue
+                if (tpl !== undefined && task.tpl !== tpl) continue
+
+                task()
             }
-            if (AUTO) timerId = setTimeout(letMeSee, 50)
+            if (AUTO) timerId = setTimeout(letMeSee, DURATION)
         }
-        if (AUTO) timerId = setTimeout(letMeSee, 50)
+        if (AUTO) timerId = setTimeout(letMeSee, DURATION)
 
 
 
@@ -68,12 +74,12 @@ define(
 
         */
         var Loop = (function() {
-            var guid = 1;
+            var guid = 1
             var TYPES = {
                 ADD: 'add',
                 DELETE: 'delete',
                 UPDATE: 'update'
-            };
+            }
 
             /*
                 ## Loop.watch(data, fn(changes))
@@ -134,7 +140,7 @@ define(
             */
             function watch(data, fn, autoboxing /*, binding*/ ) { /* autoboxing: autoboxing, path */
                 var id = guid++;
-                var shadow = clone(data, autoboxing, [id]);
+                var shadow = clone(data, autoboxing, [id])
 
                 function task() {
                     var result = diff(data, shadow, autoboxing ? [id] : [], autoboxing)
@@ -283,8 +289,8 @@ define(
                     }
             */
             function clone(obj, autoboxing, path) { // path: Internal Use Only
-                var target = obj.constructor(),
-                    name, value;
+                var target = obj.constructor()
+                var name, value
 
                 path = path || []
 
@@ -389,7 +395,7 @@ define(
                     ]
             */
             function diff(newObject, oldObject, path, fix) {
-                var result = result || [];
+                var result = result || []
                 path = path || []
 
                 if (typeof newObject !== "object" || typeof oldObject !== "object") {
@@ -420,7 +426,7 @@ define(
                         change.root = newObject
                         change.context = getContext(newObject, change.path)()
                         change.getContext = getContext
-                        
+
                         change.shadow = oldObject
                     }
                 }
@@ -430,7 +436,7 @@ define(
 
             // 获取 newValue 比 oldValue 多出的属性
             function added(newValue, oldValue, path, result, type) { // type: Internal Use Only
-                var name, value;
+                var name, value
 
                 for (name in newValue) {
                     if (/\$guid|\$path|\$blocks|\$helpers/.test(name)) continue
@@ -478,7 +484,7 @@ define(
 
             // 获取 newValue 比 oldValue 变化了的属性
             function updated(newValue, oldValue, path, result) {
-                var name, value;
+                var name, value
 
                 for (name in newValue) {
                     if (/\$guid|\$path|\$blocks|\$helpers/.test(name)) continue

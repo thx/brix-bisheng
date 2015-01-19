@@ -57,14 +57,19 @@
             data = {
                 list: [{
                     title: Math.random()
+                }, {
+                    title: Math.random()
+                }, {
+                    title: Math.random()
                 }]
             }
             setInterval(function(){
               // BS.apply()
             }, 1000)
-            BS.bind(data, tpl, function(content){
+            bs = BS.bind(data, tpl, function(content){
                 $('#demo').append(content)
             })
+            // bs.apply()
         })
     </script>
 
