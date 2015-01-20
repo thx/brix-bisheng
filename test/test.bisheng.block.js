@@ -394,7 +394,7 @@ describe('Block', function() {
         var tpl = heredoc(function() {
             /*
 <div class="comments {{#if comments}}hello{{/if}}">
-  {{#if comments.length}}
+  {{#if comments}}
   {{#each comments}}
     <div class="comment">
       <h2>{{subject}}</h2>
@@ -438,7 +438,7 @@ describe('Block', function() {
         var tpl = heredoc(function() {
             /*
 <div class="comments {{#if comments}}hello{{/if}}">
-  {{#if comments.length}}
+  {{#if comments}}
   {{#each comments}}
     <div class="comment">
       <h2>{{subject}}</h2>

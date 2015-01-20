@@ -73,6 +73,26 @@ define(
 
             // 如果未找到对应的定位符，则试着向上查找
             if (paths.length === 0) {
+                return
+                /*
+                    暂停支持的原因
+                    1. 有潜在的性能问题。根属性可能是个大数据，导致需要更新整个模板。
+                    2. 覆盖不全面，例如模板中同时出现了：
+                        1. {{#hrate rate}}{{/hrate}}
+                        2. {{#with rate}} <input value="{{value}}"> min: {{min}}, max: {{max}} {{/with}}
+                        此时，只能覆盖到第 2 段，第 1 段依然覆盖不到。
+                        如果只出现第 1 段，才会覆盖到第 1 段。
+                    3. 向上查找导致的更新可能不符合预期。例如内嵌了 View 或组件。
+                 */
+                var oldContext = change.getContext(change.shadow, change.path)()
+                var oldValue = ('oldValue' in change) ? change.oldValue :
+                    (oldContext !== undefined && oldContext !== null) ? oldContext[change.path[change.path.length - 1]] :
+                    undefined
+
+                // 向上查找的过程中，如果遇到的属性已经被监听，则停止查找；
+                // 如果遇到的属性没有被监听（可能是新增，也可能是 Handlebars helper 中才会用到），则继续。
+                if (oldValue !== undefined && oldValue !== null && oldValue.$path) return
+
                 change.path.pop()
 
                 if (change.path <= 1) return
@@ -80,7 +100,7 @@ define(
                 change.type = 'update'
                 change.value = change.context
                 change.context = change.getContext(change.root, change.path)()
-                change.oldValue = change.getContext(change.shadow, change.path)()
+                change.oldValue = oldContext
                 handle(event, change, defined, context, options)
                 return
             }

@@ -173,7 +173,7 @@ bs.apply(function(){
     
     * `change` 一个对象，格式为：
 
-        ```json
+        ```js
         {
             type: 'add/delete/update',
             path: [,,],
@@ -184,7 +184,7 @@ bs.apply(function(){
 
     * changes 是一个数组，格式为：
         
-        ```json
+        ```js
         [
             {
                 type: 'add',

@@ -30,19 +30,13 @@
 
     <script id="hello" type="template">
         <div>
-            {{#each list}}
-                <input value="{{title}}">
-            {{/each}}
+            {{#hrate rate}}{{/hrate}}
         </div>
-
-        <ul>
-        {{#each list}}
-            <li>
-            {{#if title}} {{title}} {{/if}}
-            {{#unless title}} todo {{/unless}}
-            </li>
-        {{/each}}
-        </ul>
+        <div>
+            {{#with rate}}
+                <input value="{{value}}"> min: {{min}}, max: {{max}}
+            {{/with}}
+        </div>
     </script>
 
     <div class="container">
@@ -53,22 +47,28 @@
         require(['jquery', 'handlebars', 'brix/bisheng'], function($, Handlebars, BS) {
             window.BS = BS
             // BS.auto(true)
+            
+            Handlebars.registerHelper('hrate', function(obj) {
+                var tpl = '<input value="{{value}}"> min: {{min}}, max: {{max}}'
+                return Handlebars.compile(tpl)(obj)
+            });
+
             var tpl = $('#hello').html()
             data = {
-                list: [{
-                    title: Math.random()
-                }, {
-                    title: Math.random()
-                }, {
-                    title: Math.random()
-                }]
+                rate: {
+                    value: 5,
+                    min: 1,
+                    max: 10
+                }
             }
-            setInterval(function(){
-              // BS.apply()
-            }, 1000)
             bs = BS.bind(data, tpl, function(content){
                 $('#demo').append(content)
             })
+            setInterval(function(){
+                data.rate.value++
+                bs.apply()
+            }, 1000)
+            
             // bs.apply()
         })
     </script>
