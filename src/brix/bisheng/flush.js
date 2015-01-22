@@ -1,4 +1,4 @@
-/* global define, document, setTimeout */
+/* global define, console, document, location, setTimeout */
 /*
     # Flush
     
@@ -21,6 +21,15 @@ define(
         $, _, Handlebars,
         Loop, Scanner, HTML, Locator
     ) {
+
+        var DEBUG = ~location.search.indexOf('bisheng.debug') && {
+            fix: function(arg, len) {
+                len = len || 32
+                var fix = parseInt(len, 10) - ('' + arg).length
+                for (var i = 0; i < fix; i++) arg += ' '
+                return arg
+            }
+        }
 
         /*
             ## Flush.handle(event, change, defined)
@@ -105,10 +114,17 @@ define(
                 return
             }
 
-            var type
+            var type, guid
             _.each(paths, function(path /*, index*/ ) {
                 type = Locator.parse(path, 'type')
+                guid = Locator.parse(path, 'guid')
+                var label
+                if (DEBUG) label = DEBUG.fix(guid, 4) + DEBUG.fix(type, 16) + DEBUG.fix(change.path.join('.'), 32)
+                if (DEBUG) console.group(label)
+                if (DEBUG) console.time(DEBUG.fix(''))
                 if (handle[type]) handle[type](path, event, change, defined, options)
+                if (DEBUG) console.timeEnd(DEBUG.fix(''))
+                if (DEBUG) console.groupEnd(label)
             })
         }
 
@@ -243,11 +259,21 @@ define(
         handle.block = function block(locator, event, change, defined, options) {
             var guid = Locator.parse(locator, 'guid')
             var ast = defined.$blocks[guid]
+
+            if (DEBUG) console.time(DEBUG.fix('Loop.clone'))
             var context = Loop.clone(change.context, true, change.path.slice(0, -1)) // TODO
+            if (DEBUG) console.timeEnd(DEBUG.fix('Loop.clone'))
+
             var content = Handlebars.compile(ast)(context)
 
+            if (DEBUG) console.time(DEBUG.fix('HTML.convert'))
             content = HTML.convert(content)
+            if (DEBUG) console.timeEnd(DEBUG.fix('HTML.convert'))
+
+            if (DEBUG) console.time(DEBUG.fix('Scanner.scan'))
             Scanner.scan(content[0], change.root)
+            if (DEBUG) console.timeEnd(DEBUG.fix('Scanner.scan'))
+
             content = content.contents()
 
             var target = Locator.between(locator) // https://github.com/thx/bisheng/issues/14 

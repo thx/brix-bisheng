@@ -1,5 +1,5 @@
 
-/* global define,setTimeout, clearTimeout */
+/* global define, location, console, setTimeout, clearTimeout */
 /*
     参考资料：
     * [melanke/Watch.JS](https://github.com/melanke/Watch.JS)
@@ -22,7 +22,15 @@
 define(
     'brix/bisheng/loop',[],
     function() {
-        // BEGIN(BROWSER)
+
+        var DEBUG = ~location.search.indexOf('bisheng.debug') && {
+            fix: function(arg, len) {
+                len = len || 32
+                var fix = parseInt(len, 10) - ('' + arg).length
+                for (var i = 0; i < fix; i++) arg += ' '
+                return arg
+            }
+        }
 
         // 运行模式
 
@@ -51,7 +59,9 @@ define(
                 if (data !== undefined && task.data !== data) continue
                 if (tpl !== undefined && task.tpl !== tpl) continue
 
+                if (DEBUG) console.group('task ' + i)
                 task()
+                if (DEBUG) console.groupEnd('task ' + i)
             }
             if (AUTO) timerId = setTimeout(letMeSee, DURATION)
         }
@@ -144,10 +154,16 @@ define(
                 var shadow = clone(data, autoboxing, [id])
 
                 function task() {
+                    if (DEBUG) console.time(DEBUG.fix('diff'))
                     var result = diff(data, shadow, autoboxing ? [id] : [], autoboxing)
+                    if (DEBUG) console.timeEnd(DEBUG.fix('diff'))
+
                     if (result && result.length) {
                         fn(result, data, shadow)
+
+                        if (DEBUG) console.time(DEBUG.fix('shadow'))
                         shadow = clone(data, autoboxing, [id])
+                        if (DEBUG) console.timeEnd(DEBUG.fix('shadow'))
                     }
                 }
                 task.data = data
@@ -543,8 +559,6 @@ define(
                 letMeSee: letMeSee
             }
         })()
-
-        // END(BROWSER)
 
         return Loop
 
@@ -952,7 +966,7 @@ define(
         }
     }
 );
-/* global define */
+/* global define, console, location */
 /*
     # Scanner
 
@@ -968,6 +982,15 @@ define(
         $, _,
         Loop, Locator
     ) {
+
+        var DEBUG = ~location.search.indexOf('bisheng.debug') && {
+            fix: function(arg, len) {
+                len = len || 32
+                var fix = parseInt(len, 10) - ('' + arg).length
+                for (var i = 0; i < fix; i++) arg += ' '
+                return arg
+            }
+        }
 
         // 入口方法
         function scan(node, data) {
@@ -997,14 +1020,17 @@ define(
             扫描文本节点
         */
         function scanTexNode(node) {
+            var reph = Locator.getLocatorRegExp()
             var text = node.textContent || node.innerText || node.nodeValue
-            var contents = $('<div>' + text + '</div>').contents()
-            _.each(contents, function(elem /*, index*/ ) {
-                Locator.update(elem, {
-                    type: 'text'
+            if (text.length && $.trim(text).length && reph.test(text)) {
+                var contents = $('<div>' + text + '</div>').contents()
+                _.each(contents, function(elem /*, index*/ ) {
+                    Locator.update(elem, {
+                        type: 'text'
+                    })
                 })
-            })
-            contents.replaceAll(node)
+                contents.replaceAll(node)
+            }
         }
 
         /*
@@ -1042,34 +1068,35 @@ define(
             var reph = Locator.getLocatorRegExp()
             var restyle = /([^;]*?): ([^;]*)/ig
 
-            var attributes = []
-            _.each(
+            var all = function() {
                 // “Array.prototype.slice: 'this' is not a JavaScript object” error in IE8
                 // slice.call(node.attributes || [], 0)
-                function() {
-                    var re = []
-                    var all = node.attributes
-                    for (var i = 0; i < all.length; i++) {
-                        /*
-                            Fixes bug:
-                            在 IE6 中，input.attributeNode('value').specified 为 false，导致取不到 value 属性。
-                            所以，增加了对 nodeValue 的判断。
-                        */
-                        if (all[i].specified || all[i].nodeValue) re.push(all[i])
-                    }
-                    return re
-                }(),
-                function(attributeNode /*, index*/ ) {
 
-                    var nodeName = attributeNode.nodeName,
-                        nodeValue = attributeNode.value, // nodeValue
-                        ma, stylema, hook;
-                    // 'Attr.nodeValue' is deprecated. Please use 'value' instead.
+                var re = []
+                var all = node.attributes
+                for (var i = 0; i < all.length; i++) {
+                    /*
+                        Fixes bug:
+                        在 IE6 中，input.attributeNode('value').specified 为 false，导致取不到 value 属性。
+                        所以，增加了对 nodeValue 的判断。
+                    */
+                    if (all[i].specified || all[i].nodeValue) re.push(all[i])
+                }
+                return re
+            }()
+
+            if (all.length) {
+                _.each(all, function(attributeNode /*, index*/ ) {
+                    var nodeName = attributeNode.nodeName
+                    var nodeValue = attributeNode.value // 'Attr.nodeValue' is deprecated. Please use 'value' instead.
+                    var ma, stylema, hook
+                    var attributes = []
 
                     nodeName = nodeName.toLowerCase()
                     hook = AttributeHooks[nodeName]
                     nodeName = hook ? hook.name : nodeName
 
+                    // if (reph.test(nodeValue)) {
                     if (nodeName === 'style') {
                         restyle.exec('')
                         while ((stylema = restyle.exec(nodeValue))) {
@@ -1111,10 +1138,11 @@ define(
                             if (slot === 'end') $(node).after(elem)
                         })
                     }
+                    // }
 
                     if (hook) hook.teardown(node, nodeValue)
-                }
-            )
+                })
+            }
         }
 
         // 扫描子节点
@@ -1335,7 +1363,7 @@ define(
         return HTML
     }
 );
-/* global define, document, setTimeout */
+/* global define, console, document, location, setTimeout */
 /*
     # Flush
     
@@ -1358,6 +1386,15 @@ define(
         $, _, Handlebars,
         Loop, Scanner, HTML, Locator
     ) {
+
+        var DEBUG = ~location.search.indexOf('bisheng.debug') && {
+            fix: function(arg, len) {
+                len = len || 32
+                var fix = parseInt(len, 10) - ('' + arg).length
+                for (var i = 0; i < fix; i++) arg += ' '
+                return arg
+            }
+        }
 
         /*
             ## Flush.handle(event, change, defined)
@@ -1442,10 +1479,17 @@ define(
                 return
             }
 
-            var type
+            var type, guid
             _.each(paths, function(path /*, index*/ ) {
                 type = Locator.parse(path, 'type')
+                guid = Locator.parse(path, 'guid')
+                var label
+                if (DEBUG) label = DEBUG.fix(guid, 4) + DEBUG.fix(type, 16) + DEBUG.fix(change.path.join('.'), 32)
+                if (DEBUG) console.group(label)
+                if (DEBUG) console.time(DEBUG.fix(''))
                 if (handle[type]) handle[type](path, event, change, defined, options)
+                if (DEBUG) console.timeEnd(DEBUG.fix(''))
+                if (DEBUG) console.groupEnd(label)
             })
         }
 
@@ -1580,11 +1624,21 @@ define(
         handle.block = function block(locator, event, change, defined, options) {
             var guid = Locator.parse(locator, 'guid')
             var ast = defined.$blocks[guid]
+
+            if (DEBUG) console.time(DEBUG.fix('Loop.clone'))
             var context = Loop.clone(change.context, true, change.path.slice(0, -1)) // TODO
+            if (DEBUG) console.timeEnd(DEBUG.fix('Loop.clone'))
+
             var content = Handlebars.compile(ast)(context)
 
+            if (DEBUG) console.time(DEBUG.fix('HTML.convert'))
             content = HTML.convert(content)
+            if (DEBUG) console.timeEnd(DEBUG.fix('HTML.convert'))
+
+            if (DEBUG) console.time(DEBUG.fix('Scanner.scan'))
             Scanner.scan(content[0], change.root)
+            if (DEBUG) console.timeEnd(DEBUG.fix('Scanner.scan'))
+
             content = content.contents()
 
             var target = Locator.between(locator) // https://github.com/thx/bisheng/issues/14 
@@ -1781,7 +1835,14 @@ define(
     ) {
 
         var guid = 1
-        var DEBUG = ~location.search.indexOf('debug')
+        var DEBUG = ~location.search.indexOf('bisheng.debug') && {
+            fix: function(arg, len) {
+                len = len || 32
+                var fix = parseInt(len, 10) - ('' + arg).length
+                for (var i = 0; i < fix; i++) arg += ' '
+                return arg
+            }
+        }
 
         /*
             ## BiSheng.auto(bool)
@@ -1834,6 +1895,11 @@ define(
 
         */
         function bind(data, tpl, options, context) {
+            if (DEBUG) {
+                console.group('bind')
+                console.time('bind')
+            }
+
             // BiSheng.bind(data, tpl, callback, context)
             if (typeof options === 'function') {
                 options = {
@@ -1856,11 +1922,20 @@ define(
 
             // 属性监听函数
             function task(changes) {
-                _.each(changes, function(change /*, index*/ ) {
+                _.each(changes, function(change, index) {
                     var event = {
                         target: []
                     }
+
+                    var label
+                    if (DEBUG) label = DEBUG.fix('flush [' + index + '] ' + change.path.join('.'))
+                    if (DEBUG) console.group(label)
+                    if (DEBUG) console.time(label)
                     Flush.handle(event, change, clone, context, options)
+                    if (DEBUG) console.timeEnd(label)
+                    if (DEBUG) console.groupEnd(label)
+                    if (DEBUG) console.log('>', change.path.join('.'))
+
                     if (location.href.indexOf('scrollIntoView') > -1) Flush.scrollIntoView(event, data)
                     if (location.href.indexOf('highlight') > -1) Flush.highlight(event, data)
                 })
@@ -1868,7 +1943,9 @@ define(
             task.tpl = tpl
 
             // 为所有属性添加监听函数
+            if (DEBUG) console.time(DEBUG.fix('clone'))
             var clone = Loop.watch(data, task, true, true)
+            if (DEBUG) console.timeEnd(DEBUG.fix('clone'))
 
             // 预处理 HTML 属性（IE 遇到非法的样式会丢弃）
             tpl = tpl.replace(/(<.*?)(style)(=.*?>)/g, '$1bs-style$3')
@@ -1876,19 +1953,36 @@ define(
                 .replace(/(<img.*?)(src)(=.*?>)/g, '$1bs-src$3')
 
             // 修改 AST，为 Expression 和 Block 插入占位符
+            if (DEBUG) console.time(DEBUG.fix('ast'))
             var ast = Handlebars.parse(tpl)
             AST.handle(ast, undefined, undefined, clone.$blocks = {}, clone.$helpers = {})
+            if (DEBUG) console.timeEnd(DEBUG.fix('ast'))
 
-            // 渲染 HTML
+            // 编译模板
+            if (DEBUG) console.time(DEBUG.fix('compile'))
             var compiled = Handlebars.compile(ast)
+            if (DEBUG) console.timeEnd(DEBUG.fix('compile'))
+
+            // 渲染模板
+            if (DEBUG) console.time(DEBUG.fix('render'))
             var html = compiled(clone)
+            if (DEBUG) console.timeEnd(DEBUG.fix('render'))
 
             // 提前解析 table 中的定位符
+            if (DEBUG) console.time(DEBUG.fix('table'))
             html = HTML.table(html)
+            if (DEBUG) console.timeEnd(DEBUG.fix('table'))
+
+            // 转换为 DOM 树
+            if (DEBUG) console.time(DEBUG.fix('convert'))
+            var content = $(HTML.convert(html))
+            if (DEBUG) console.timeEnd(DEBUG.fix('convert'))
 
             // 扫描占位符，定位 Expression 和 Block
-            var content = $(HTML.convert(html))
+            if (DEBUG) console.time(DEBUG.fix('scan'))
             if (content.length) Scanner.scan(content[0], data)
+            if (DEBUG) console.timeEnd(DEBUG.fix('scan'))
+
             content = content.contents().get()
 
             /*
@@ -1902,6 +1996,11 @@ define(
 
             if (options.resolve) options.resolve.call(data, content)
 
+            if (DEBUG) {
+                console.timeEnd('bind')
+                console.groupEnd('bind')
+            }
+
             return {
                 data: data,
                 tpl: tpl,
@@ -1911,8 +2010,20 @@ define(
                 },
                 apply: function(fn) {
                     if (fn) fn(this.data)
-                    if (DEBUG) console.log('applying ...')
+
+                    var label = 'applying'
+                    if (DEBUG) {
+                        console.group(label)
+                        console.time(label)
+                    }
+
                     Loop.letMeSee(this.data, this.tpl)
+
+                    if (DEBUG) {
+                        console.timeEnd(label)
+                        console.groupEnd(label)
+                    }
+
                     return this
                 }
             }

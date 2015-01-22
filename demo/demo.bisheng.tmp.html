@@ -29,13 +29,18 @@
     </script>
 
     <script id="hello" type="template">
-        <div>
-            {{#hrate rate}}{{/hrate}}
-        </div>
-        <div>
-            {{#with rate}}
-                <input value="{{value}}"> min: {{min}}, max: {{max}}
-            {{/with}}
+        <div class="comments {{#if comments}}hello{{/if}}">
+          {{#if comments}}
+          {{#each comments}}
+            <div class="comment">
+              <h2>{{subject}}</h2>
+              <span>{{{body}}}</span>
+            </div>
+          {{/each}}
+          {{/if}}
+          {{#unless comments}}
+            <h3 class="warning">WARNING: This entry does not have any records!</h3>
+          {{/unless}}
         </div>
     </script>
 
@@ -43,31 +48,48 @@
         <div id="demo"></div>
     </div>
 
+    <script src="fb.js"></script>
     <script type="text/javascript">
         require(['jquery', 'handlebars', 'brix/bisheng'], function($, Handlebars, BS) {
             window.BS = BS
             // BS.auto(true)
-            
-            Handlebars.registerHelper('hrate', function(obj) {
-                var tpl = '<input value="{{value}}"> min: {{min}}, max: {{max}}'
-                return Handlebars.compile(tpl)(obj)
-            });
-
             var tpl = $('#hello').html()
             data = {
-                rate: {
-                    value: 5,
-                    min: 1,
-                    max: 10
-                }
+                fbdata: fbdata,
+                comments: []
+            }
+            for (var i = 0; i < 1000; i++) {
+                data.comments.push({
+                    subject: 'subject' + Math.random(),
+                    body: 'body' + Math.random(),
+                    nested: {
+                        nested: {
+                            nested: {
+                                nested: {
+                                    nested: {
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+                })
             }
             bs = BS.bind(data, tpl, function(content){
                 $('#demo').append(content)
             })
-            setInterval(function(){
-                data.rate.value++
+            setTimeout(function(){
+                console.log(data.comments.length)
+                data.comments.push({
+                    subject: 'subject' + Math.random(),
+                    body: 'body' + Math.random()
+                })
+                // data.comments.push({
+                //     subject: 'subject' + Math.random(),
+                //     body: 'body' + Math.random()
+                // })
                 bs.apply()
-            }, 1000)
+            }, 10)
             
             // bs.apply()
         })

@@ -15,7 +15,14 @@ define(
     ) {
 
         var guid = 1
-        var DEBUG = ~location.search.indexOf('debug')
+        var DEBUG = ~location.search.indexOf('bisheng.debug') && {
+            fix: function(arg, len) {
+                len = len || 32
+                var fix = parseInt(len, 10) - ('' + arg).length
+                for (var i = 0; i < fix; i++) arg += ' '
+                return arg
+            }
+        }
 
         /*
             ## BiSheng.auto(bool)
@@ -68,6 +75,11 @@ define(
 
         */
         function bind(data, tpl, options, context) {
+            if (DEBUG) {
+                console.group('bind')
+                console.time('bind')
+            }
+
             // BiSheng.bind(data, tpl, callback, context)
             if (typeof options === 'function') {
                 options = {
@@ -90,11 +102,20 @@ define(
 
             // 属性监听函数
             function task(changes) {
-                _.each(changes, function(change /*, index*/ ) {
+                _.each(changes, function(change, index) {
                     var event = {
                         target: []
                     }
+
+                    var label
+                    if (DEBUG) label = DEBUG.fix('flush [' + index + '] ' + change.path.join('.'))
+                    if (DEBUG) console.group(label)
+                    if (DEBUG) console.time(label)
                     Flush.handle(event, change, clone, context, options)
+                    if (DEBUG) console.timeEnd(label)
+                    if (DEBUG) console.groupEnd(label)
+                    if (DEBUG) console.log('>', change.path.join('.'))
+
                     if (location.href.indexOf('scrollIntoView') > -1) Flush.scrollIntoView(event, data)
                     if (location.href.indexOf('highlight') > -1) Flush.highlight(event, data)
                 })
@@ -102,7 +123,9 @@ define(
             task.tpl = tpl
 
             // 为所有属性添加监听函数
+            if (DEBUG) console.time(DEBUG.fix('clone'))
             var clone = Loop.watch(data, task, true, true)
+            if (DEBUG) console.timeEnd(DEBUG.fix('clone'))
 
             // 预处理 HTML 属性（IE 遇到非法的样式会丢弃）
             tpl = tpl.replace(/(<.*?)(style)(=.*?>)/g, '$1bs-style$3')
@@ -110,19 +133,36 @@ define(
                 .replace(/(<img.*?)(src)(=.*?>)/g, '$1bs-src$3')
 
             // 修改 AST，为 Expression 和 Block 插入占位符
+            if (DEBUG) console.time(DEBUG.fix('ast'))
             var ast = Handlebars.parse(tpl)
             AST.handle(ast, undefined, undefined, clone.$blocks = {}, clone.$helpers = {})
+            if (DEBUG) console.timeEnd(DEBUG.fix('ast'))
 
-            // 渲染 HTML
+            // 编译模板
+            if (DEBUG) console.time(DEBUG.fix('compile'))
             var compiled = Handlebars.compile(ast)
+            if (DEBUG) console.timeEnd(DEBUG.fix('compile'))
+
+            // 渲染模板
+            if (DEBUG) console.time(DEBUG.fix('render'))
             var html = compiled(clone)
+            if (DEBUG) console.timeEnd(DEBUG.fix('render'))
 
             // 提前解析 table 中的定位符
+            if (DEBUG) console.time(DEBUG.fix('table'))
             html = HTML.table(html)
+            if (DEBUG) console.timeEnd(DEBUG.fix('table'))
+
+            // 转换为 DOM 树
+            if (DEBUG) console.time(DEBUG.fix('convert'))
+            var content = $(HTML.convert(html))
+            if (DEBUG) console.timeEnd(DEBUG.fix('convert'))
 
             // 扫描占位符，定位 Expression 和 Block
-            var content = $(HTML.convert(html))
+            if (DEBUG) console.time(DEBUG.fix('scan'))
             if (content.length) Scanner.scan(content[0], data)
+            if (DEBUG) console.timeEnd(DEBUG.fix('scan'))
+
             content = content.contents().get()
 
             /*
@@ -136,6 +176,11 @@ define(
 
             if (options.resolve) options.resolve.call(data, content)
 
+            if (DEBUG) {
+                console.timeEnd('bind')
+                console.groupEnd('bind')
+            }
+
             return {
                 data: data,
                 tpl: tpl,
@@ -145,8 +190,20 @@ define(
                 },
                 apply: function(fn) {
                     if (fn) fn(this.data)
-                    if (DEBUG) console.log('applying ...')
+
+                    var label = 'applying'
+                    if (DEBUG) {
+                        console.group(label)
+                        console.time(label)
+                    }
+
                     Loop.letMeSee(this.data, this.tpl)
+
+                    if (DEBUG) {
+                        console.timeEnd(label)
+                        console.groupEnd(label)
+                    }
+
                     return this
                 }
             }

@@ -1,4 +1,4 @@
-/* global define */
+/* global define, console, location */
 /*
     # Scanner
 
@@ -14,6 +14,15 @@ define(
         $, _,
         Loop, Locator
     ) {
+
+        var DEBUG = ~location.search.indexOf('bisheng.debug') && {
+            fix: function(arg, len) {
+                len = len || 32
+                var fix = parseInt(len, 10) - ('' + arg).length
+                for (var i = 0; i < fix; i++) arg += ' '
+                return arg
+            }
+        }
 
         // 入口方法
         function scan(node, data) {
@@ -43,14 +52,17 @@ define(
             扫描文本节点
         */
         function scanTexNode(node) {
+            var reph = Locator.getLocatorRegExp()
             var text = node.textContent || node.innerText || node.nodeValue
-            var contents = $('<div>' + text + '</div>').contents()
-            _.each(contents, function(elem /*, index*/ ) {
-                Locator.update(elem, {
-                    type: 'text'
+            if (text.length && $.trim(text).length && reph.test(text)) {
+                var contents = $('<div>' + text + '</div>').contents()
+                _.each(contents, function(elem /*, index*/ ) {
+                    Locator.update(elem, {
+                        type: 'text'
+                    })
                 })
-            })
-            contents.replaceAll(node)
+                contents.replaceAll(node)
+            }
         }
 
         /*
@@ -88,34 +100,35 @@ define(
             var reph = Locator.getLocatorRegExp()
             var restyle = /([^;]*?): ([^;]*)/ig
 
-            var attributes = []
-            _.each(
+            var all = function() {
                 // “Array.prototype.slice: 'this' is not a JavaScript object” error in IE8
                 // slice.call(node.attributes || [], 0)
-                function() {
-                    var re = []
-                    var all = node.attributes
-                    for (var i = 0; i < all.length; i++) {
-                        /*
-                            Fixes bug:
-                            在 IE6 中，input.attributeNode('value').specified 为 false，导致取不到 value 属性。
-                            所以，增加了对 nodeValue 的判断。
-                        */
-                        if (all[i].specified || all[i].nodeValue) re.push(all[i])
-                    }
-                    return re
-                }(),
-                function(attributeNode /*, index*/ ) {
 
-                    var nodeName = attributeNode.nodeName,
-                        nodeValue = attributeNode.value, // nodeValue
-                        ma, stylema, hook;
-                    // 'Attr.nodeValue' is deprecated. Please use 'value' instead.
+                var re = []
+                var all = node.attributes
+                for (var i = 0; i < all.length; i++) {
+                    /*
+                        Fixes bug:
+                        在 IE6 中，input.attributeNode('value').specified 为 false，导致取不到 value 属性。
+                        所以，增加了对 nodeValue 的判断。
+                    */
+                    if (all[i].specified || all[i].nodeValue) re.push(all[i])
+                }
+                return re
+            }()
+
+            if (all.length) {
+                _.each(all, function(attributeNode /*, index*/ ) {
+                    var nodeName = attributeNode.nodeName
+                    var nodeValue = attributeNode.value // 'Attr.nodeValue' is deprecated. Please use 'value' instead.
+                    var ma, stylema, hook
+                    var attributes = []
 
                     nodeName = nodeName.toLowerCase()
                     hook = AttributeHooks[nodeName]
                     nodeName = hook ? hook.name : nodeName
 
+                    // if (reph.test(nodeValue)) {
                     if (nodeName === 'style') {
                         restyle.exec('')
                         while ((stylema = restyle.exec(nodeValue))) {
@@ -157,10 +170,11 @@ define(
                             if (slot === 'end') $(node).after(elem)
                         })
                     }
+                    // }
 
                     if (hook) hook.teardown(node, nodeValue)
-                }
-            )
+                })
+            }
         }
 
         // 扫描子节点

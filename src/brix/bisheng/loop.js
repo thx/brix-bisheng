@@ -1,4 +1,4 @@
-/* global define,setTimeout, clearTimeout */
+/* global define, location, console, setTimeout, clearTimeout */
 /*
     参考资料：
     * [melanke/Watch.JS](https://github.com/melanke/Watch.JS)
@@ -21,7 +21,15 @@
 define(
     [],
     function() {
-        // BEGIN(BROWSER)
+
+        var DEBUG = ~location.search.indexOf('bisheng.debug') && {
+            fix: function(arg, len) {
+                len = len || 32
+                var fix = parseInt(len, 10) - ('' + arg).length
+                for (var i = 0; i < fix; i++) arg += ' '
+                return arg
+            }
+        }
 
         // 运行模式
 
@@ -50,7 +58,9 @@ define(
                 if (data !== undefined && task.data !== data) continue
                 if (tpl !== undefined && task.tpl !== tpl) continue
 
+                if (DEBUG) console.group('task ' + i)
                 task()
+                if (DEBUG) console.groupEnd('task ' + i)
             }
             if (AUTO) timerId = setTimeout(letMeSee, DURATION)
         }
@@ -143,10 +153,16 @@ define(
                 var shadow = clone(data, autoboxing, [id])
 
                 function task() {
+                    if (DEBUG) console.time(DEBUG.fix('diff'))
                     var result = diff(data, shadow, autoboxing ? [id] : [], autoboxing)
+                    if (DEBUG) console.timeEnd(DEBUG.fix('diff'))
+
                     if (result && result.length) {
                         fn(result, data, shadow)
+
+                        if (DEBUG) console.time(DEBUG.fix('shadow'))
                         shadow = clone(data, autoboxing, [id])
+                        if (DEBUG) console.timeEnd(DEBUG.fix('shadow'))
                     }
                 }
                 task.data = data
@@ -542,8 +558,6 @@ define(
                 letMeSee: letMeSee
             }
         })()
-
-        // END(BROWSER)
 
         return Loop
 
