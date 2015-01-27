@@ -478,4 +478,43 @@ describe('Block', function() {
         bindThenCheck(data, tpl, task, expected, done, before)
     })
 
+    it('scoped', function(done) {
+        var tpl = heredoc(function() {
+            /*
+<ul>
+    {{#each comments}}
+    <li>
+        <input value="{{.}}">
+    </li>
+    {{/each}}
+</ul>
+<ul>
+    {{#each comments}}
+    <li>
+        <span>
+            {{#if .}}{{.}}{{/if}}
+            {{#unless .}}placeholder{{/unless}}
+        </span>
+    </li>
+    {{/each}}
+</ul>
+        */
+        })
+        var data = {
+            comments: ["", ""]
+        }
+        var task = function() {
+            data.comments[0] = 1
+        }
+        var expected = function(container) {
+            expect(container.find('input:eq(0)').val()).to.equal('1')
+            expect(container.find('span:eq(0)').text().trim()).to.equal('1')
+        }
+        var before = function(container) {
+            expect(container.find('input:eq(0)').val()).to.equal('')
+            expect(container.find('span:eq(0)').text().trim()).to.equal('placeholder')
+        }
+        bindThenCheck(data, tpl, task, expected, done, before)
+    })
+
 })

@@ -99,7 +99,11 @@ define(
                     slot: '',
                     type: 'text',
                     path: '{{$lastest ' + prop + '}}',
-                    ishelper: !!node.isHelper
+                    ishelper: !!node.isHelper,
+                    isscoped: function() {
+                        if (!node.isHelper) return node.id.isScoped
+                        return false // TODO
+                    }()
                 }
                 var placeholder
                 var statements
@@ -147,7 +151,11 @@ define(
                     slot: '',
                     type: 'block',
                     path: '{{$lastest ' + prop + '}}',
-                    helper: helper
+                    helper: helper,
+                    isscoped: function() {
+                        if (node.mustache.params.length === 0) return false // TODO
+                        return node.mustache.params[0].isScoped
+                    }()
                 }
                 var placeholder
                 var statements

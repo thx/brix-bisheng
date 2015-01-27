@@ -883,7 +883,11 @@ define(
                     slot: '',
                     type: 'text',
                     path: '{{$lastest ' + prop + '}}',
-                    ishelper: !!node.isHelper
+                    ishelper: !!node.isHelper,
+                    isscoped: function() {
+                        if (!node.isHelper) return node.id.isScoped
+                        return false // TODO
+                    }()
                 }
                 var placeholder
                 var statements
@@ -931,7 +935,11 @@ define(
                     slot: '',
                     type: 'block',
                     path: '{{$lastest ' + prop + '}}',
-                    helper: helper
+                    helper: helper,
+                    isscoped: function() {
+                        if (node.mustache.params.length === 0) return false // TODO
+                        return node.mustache.params[0].isScoped
+                    }()
                 }
                 var placeholder
                 var statements
@@ -1623,13 +1631,16 @@ define(
         // 更新数组对应的 Block，路径 > guid > Block
         handle.block = function block(locator, event, change, defined, options) {
             var guid = Locator.parse(locator, 'guid')
+            var isscoped = Locator.parse(locator, 'isscoped')
             var ast = defined.$blocks[guid]
 
             if (DEBUG) console.time(DEBUG.fix('Loop.clone'))
             var context = Loop.clone(change.context, true, change.path.slice(0, -1)) // TODO
             if (DEBUG) console.timeEnd(DEBUG.fix('Loop.clone'))
 
-            var content = Handlebars.compile(ast)(context)
+            var content = Handlebars.compile(ast)(
+                (isscoped === 'true' || isscoped === true) ? change.value : context
+            )
 
             if (DEBUG) console.time(DEBUG.fix('HTML.convert'))
             content = HTML.convert(content)
