@@ -1959,6 +1959,7 @@ define(
             if (DEBUG) console.timeEnd(DEBUG.fix('clone'))
 
             // 预处理 HTML 属性（IE 遇到非法的样式会丢弃）
+            var originalTpl = tpl
             tpl = tpl.replace(/(<.*?)(style)(=.*?>)/g, '$1bs-style$3')
                 .replace(/(<input.*?)(checked)(=.*?>)/g, '$1bs-checked$3')
                 .replace(/(<img.*?)(src)(=.*?>)/g, '$1bs-src$3')
@@ -2014,7 +2015,7 @@ define(
 
             return {
                 data: data,
-                tpl: tpl,
+                tpl: originalTpl,
                 unbind: function() {
                     unbind(this.data, this.tpl)
                     return this
