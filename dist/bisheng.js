@@ -1006,7 +1006,7 @@ define(
             scanNode(node)
 
             // dom > data
-            scanFormElements(node, data)
+            scanFormElements(node, data, tpl)
         }
 
         // 扫描单个节点，包括：属性，子节点。
