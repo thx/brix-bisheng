@@ -1209,7 +1209,7 @@ define(
                                 .trigger('change.bisheng', firing = true)
                         }
                         updateChecked(data, path, event.target)
-                        if (!Loop.auto()) Loop.letMeSee()
+                        if (!Loop.auto()) Loop.letMeSee(data, tpl)
                     })
                 })
         }
