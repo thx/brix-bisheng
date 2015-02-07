@@ -25,7 +25,7 @@ define(
         }
 
         // 入口方法
-        function scan(node, data) {
+        function scan(node, data, tpl) {
             // data > dom, expression
             scanNode(node)
 
@@ -185,7 +185,7 @@ define(
         }
 
         // 扫描表单元素
-        function scanFormElements(node, data) {
+        function scanFormElements(node, data, tpl) {
             var locators = Locator.find({
                 slot: "start",
                 type: "attribute",
@@ -198,7 +198,7 @@ define(
                 // TODO 为什么不触发 change 事件？
                 $(target).on('change.bisheng keyup.bisheng', function(event) {
                     updateValue(data, path, event.target)
-                    if (!Loop.auto()) Loop.letMeSee()
+                    if (!Loop.auto()) Loop.letMeSee(data, tpl)
                 })
             })
 

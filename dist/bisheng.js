@@ -1001,7 +1001,7 @@ define(
         }
 
         // 入口方法
-        function scan(node, data) {
+        function scan(node, data, tpl) {
             // data > dom, expression
             scanNode(node)
 
@@ -1161,7 +1161,7 @@ define(
         }
 
         // 扫描表单元素
-        function scanFormElements(node, data) {
+        function scanFormElements(node, data, tpl) {
             var locators = Locator.find({
                 slot: "start",
                 type: "attribute",
@@ -1174,7 +1174,7 @@ define(
                 // TODO 为什么不触发 change 事件？
                 $(target).on('change.bisheng keyup.bisheng', function(event) {
                     updateValue(data, path, event.target)
-                    if (!Loop.auto()) Loop.letMeSee()
+                    if (!Loop.auto()) Loop.letMeSee(data, tpl)
                 })
             })
 
@@ -1992,7 +1992,7 @@ define(
 
             // 扫描占位符，定位 Expression 和 Block
             if (DEBUG) console.time(DEBUG.fix('scan'))
-            if (content.length) Scanner.scan(content[0], data)
+            if (content.length) Scanner.scan(content[0], data, originalTpl)
             if (DEBUG) console.timeEnd(DEBUG.fix('scan'))
 
             content = content.contents().get()

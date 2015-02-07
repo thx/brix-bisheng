@@ -161,7 +161,7 @@ define(
 
             // 扫描占位符，定位 Expression 和 Block
             if (DEBUG) console.time(DEBUG.fix('scan'))
-            if (content.length) Scanner.scan(content[0], data)
+            if (content.length) Scanner.scan(content[0], data, originalTpl)
             if (DEBUG) console.timeEnd(DEBUG.fix('scan'))
 
             content = content.contents().get()
