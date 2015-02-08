@@ -197,6 +197,14 @@ define(
 
                 // TODO 为什么不触发 change 事件？
                 $(target).on('change.bisheng keyup.bisheng', function(event) {
+                    // 忽略不产生输入的辅助按键
+                    if (event.type === 'keyup') {
+                        var key = event.keyCode
+
+                        //    command            modifiers                   arrows
+                        if (key === 91 || (15 < key && key < 19) || (37 <= key && key <= 40)) return
+                    }
+
                     updateValue(data, path, event.target)
                     if (!Loop.auto()) Loop.letMeSee(data, tpl)
                 })

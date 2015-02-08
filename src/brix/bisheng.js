@@ -108,7 +108,7 @@ define(
                     }
 
                     var label
-                    if (DEBUG) label = DEBUG.fix('flush changes[' + index + '] ' + change.path.join('.'))
+                    if (DEBUG) label = DEBUG.fix('Flush.handle changes[' + index + '] ' + change.path.join('.'))
                     if (DEBUG) console.time(label)
                     if (DEBUG) console.group(label)
                     Flush.handle(event, change, clone, context, options)

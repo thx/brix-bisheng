@@ -63,9 +63,7 @@ define(
                 if (data !== undefined && task.data !== data) continue
                 if (tpl !== undefined && task.tpl !== tpl) continue
 
-                if (DEBUG) console.group('task ' + i)
-                task()
-                if (DEBUG) console.groupEnd('task ' + i)
+                task(i)
             }
             if (AUTO) timerId = setTimeout(letMeSee, DURATION)
         }
@@ -157,7 +155,8 @@ define(
                 var id = guid++;
                 var shadow = clone(data, autoboxing, [id])
 
-                function task() {
+                function task(index) {
+                    if (DEBUG) console.group('task ' + index)
                     if (DEBUG) console.time(DEBUG.fix('diff'))
                     var result = diff(data, shadow, autoboxing ? [id] : [], autoboxing)
                     if (DEBUG) console.timeEnd(DEBUG.fix('diff'))
@@ -165,12 +164,13 @@ define(
                     if (result && result.length) {
                         fn(result, data, shadow)
 
-                        if (DEBUG) console.time(DEBUG.fix('shadow'))
+                        if (DEBUG) console.time(DEBUG.fix('clone shadow'))
                         shadow = clone(data, autoboxing, [id])
-                        if (DEBUG) console.timeEnd(DEBUG.fix('shadow'))
+                        if (DEBUG) console.timeEnd(DEBUG.fix('clone shadow'))
                     }
+                    if (DEBUG) console.groupEnd('task ' + index)
                 }
-                task = _.throttle(task, 10)
+                task = _.throttle(task, DURATION)
                 task.data = data
                 task.callback = fn
                 if (fn && fn.tpl) task.tpl = fn.tpl
@@ -1178,6 +1178,14 @@ define(
 
                 // TODO 为什么不触发 change 事件？
                 $(target).on('change.bisheng keyup.bisheng', function(event) {
+                    // 忽略不产生输入的辅助按键
+                    if (event.type === 'keyup') {
+                        var key = event.keyCode
+
+                        //    command            modifiers                   arrows
+                        if (key === 91 || (15 < key && key < 19) || (37 <= key && key <= 40)) return
+                    }
+
                     updateValue(data, path, event.target)
                     if (!Loop.auto()) Loop.letMeSee(data, tpl)
                 })
@@ -1453,6 +1461,7 @@ define(
             if ((change.type === 'delete' || change.type === 'add') && change.context instanceof Array) { /*paths.length === 0 && */
                 change.path.pop()
                 change.type = 'update'
+                change.value = change.context
                 change.context = change.getContext(change.root, change.path)()
                 handle(event, change, defined, context, options)
                 return
@@ -1499,9 +1508,9 @@ define(
                 var label
                 if (DEBUG) label = DEBUG.fix(guid, 4) + DEBUG.fix(type, 16) + DEBUG.fix(change.path.join('.'), 32)
                 if (DEBUG) console.group(label)
-                if (DEBUG) console.time(DEBUG.fix(''))
+                if (DEBUG) console.time(DEBUG.fix('Flush.handle[' + type + ']'))
                 if (handle[type]) handle[type](path, event, change, defined, options)
-                if (DEBUG) console.timeEnd(DEBUG.fix(''))
+                if (DEBUG) console.timeEnd(DEBUG.fix('Flush.handle[' + type + ']'))
                 if (DEBUG) console.groupEnd(label)
             })
         }
@@ -1944,7 +1953,7 @@ define(
                     }
 
                     var label
-                    if (DEBUG) label = DEBUG.fix('flush changes[' + index + '] ' + change.path.join('.'))
+                    if (DEBUG) label = DEBUG.fix('Flush.handle changes[' + index + '] ' + change.path.join('.'))
                     if (DEBUG) console.time(label)
                     if (DEBUG) console.group(label)
                     Flush.handle(event, change, clone, context, options)

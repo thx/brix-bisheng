@@ -146,4 +146,147 @@ describe('Expression', function() {
         }
         bindThenCheck(data, tpl, task, expected, done)
     })
+
+    it('array push', function(done) {
+        var tpl = '{{#each list}}<p>{{array}}</p>{{/each}}'
+        var data = {
+            list: [{
+                array: [0]
+            }, {
+                array: [0, 1]
+            }, {
+                array: [0, 1, 2]
+            }]
+        }
+        var task = function() {
+            data.list.push({
+                array: [0, 1, 2, 3]
+            })
+        }
+        var before = function(container) {
+            expect(container.find('p')).to.have.length(3)
+        }
+        var expected = function(container) {
+            expect(container.find('p')).to.have.length(4)
+        }
+        bindThenCheck(data, tpl, task, expected, done, before)
+    })
+    it('array push push', function(done) {
+        var tpl = '{{#each list}}<p>{{array}}</p>{{/each}}'
+        var data = {
+            list: [{
+                array: [0]
+            }, {
+                array: [0, 1]
+            }, {
+                array: [0, 1, 2]
+            }]
+        }
+        var task = function() {
+            data.list[0].array.push(1)
+        }
+        var before = function(container) {
+            expect(container.find('p:eq(0)').text()).to.equal('0')
+        }
+        var expected = function(container) {
+            expect(container.find('p:eq(0)').text()).to.equal('0,1')
+        }
+        bindThenCheck(data, tpl, task, expected, done, before)
+    })
+    it('array pop', function(done) {
+        var tpl = '{{#each list}}<p>{{array}}</p>{{/each}}'
+        var data = {
+            list: [{
+                array: [0]
+            }, {
+                array: [0, 1]
+            }, {
+                array: [0, 1, 2]
+            }]
+        }
+        var task = function() {
+            data.list.pop()
+        }
+        var before = function(container) {
+            expect(container.find('p')).to.have.length(3)
+        }
+        var expected = function(container) {
+            expect(container.find('p')).to.have.length(2)
+        }
+        bindThenCheck(data, tpl, task, expected, done, before)
+    })
+    it('array pop pop', function(done) {
+        var tpl = '{{#each list}}<p>{{array}}</p>{{/each}}'
+        var data = {
+            list: [{
+                array: [0]
+            }, {
+                array: [0, 1]
+            }, {
+                array: [0, 1, 2]
+            }]
+        }
+        var task = function() {
+            data.list[1].array.pop()
+        }
+        var before = function(container) {
+            expect(container.find('p:eq(1)').text()).to.equal('0,1')
+        }
+        var expected = function(container) {
+            expect(container.find('p:eq(1)').text()).to.equal('0')
+        }
+        bindThenCheck(data, tpl, task, expected, done, before)
+    })
+    it('array sort', function(done) {
+        var tpl = '{{#each list}}<p>{{array}}</p>{{/each}}'
+        var data = {
+            list: [{
+                array: [0]
+            }, {
+                array: [0, 1]
+            }, {
+                array: [0, 1, 2]
+            }]
+        }
+        var task = function() {
+            data.list.sort(function(a, b) {
+                return b.array.length - a.array.length
+            })
+        }
+        var before = function(container) {
+            expect(container.find('p:eq(0)').text()).to.equal('0')
+            expect(container.find('p:eq(1)').text()).to.equal('0,1')
+            expect(container.find('p:eq(2)').text()).to.equal('0,1,2')
+        }
+        var expected = function(container) {
+            expect(container.find('p:eq(2)').text()).to.equal('0')
+            expect(container.find('p:eq(1)').text()).to.equal('0,1')
+            expect(container.find('p:eq(0)').text()).to.equal('0,1,2')
+        }
+        bindThenCheck(data, tpl, task, expected, done, before)
+    })
+    // it('array sort sort', function(done) {
+    //     var tpl = '{{#each list}}<p>{{array}}</p>{{/each}}'
+    //     var data = {
+    //         list: [{
+    //             array: [0]
+    //         }, {
+    //             array: [0, 1]
+    //         }, {
+    //             array: [0, 1, 2]
+    //         }]
+    //     }
+    //     var task = function() {
+    //         data.list[1].array.sort(function(a, b) {
+    //             return b - a
+    //         })
+    //     }
+    //     var before = function(container) {
+    //         expect(container.find('p:eq(1)').text()).to.equal('0,1')
+    //     }
+    //     var expected = function(container) {
+    //         expect(container.find('p:eq(1)').text()).to.equal('1,0')
+    //     }
+    //     bindThenCheck(data, tpl, task, expected, done, before)
+    // })
 })

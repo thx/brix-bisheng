@@ -62,9 +62,7 @@ define(
                 if (data !== undefined && task.data !== data) continue
                 if (tpl !== undefined && task.tpl !== tpl) continue
 
-                if (DEBUG) console.group('task ' + i)
-                task()
-                if (DEBUG) console.groupEnd('task ' + i)
+                task(i)
             }
             if (AUTO) timerId = setTimeout(letMeSee, DURATION)
         }
@@ -156,7 +154,8 @@ define(
                 var id = guid++;
                 var shadow = clone(data, autoboxing, [id])
 
-                function task() {
+                function task(index) {
+                    if (DEBUG) console.group('task ' + index)
                     if (DEBUG) console.time(DEBUG.fix('diff'))
                     var result = diff(data, shadow, autoboxing ? [id] : [], autoboxing)
                     if (DEBUG) console.timeEnd(DEBUG.fix('diff'))
@@ -164,12 +163,13 @@ define(
                     if (result && result.length) {
                         fn(result, data, shadow)
 
-                        if (DEBUG) console.time(DEBUG.fix('shadow'))
+                        if (DEBUG) console.time(DEBUG.fix('clone shadow'))
                         shadow = clone(data, autoboxing, [id])
-                        if (DEBUG) console.timeEnd(DEBUG.fix('shadow'))
+                        if (DEBUG) console.timeEnd(DEBUG.fix('clone shadow'))
                     }
+                    if (DEBUG) console.groupEnd('task ' + index)
                 }
-                task = _.throttle(task, 10)
+                task = _.throttle(task, DURATION)
                 task.data = data
                 task.callback = fn
                 if (fn && fn.tpl) task.tpl = fn.tpl

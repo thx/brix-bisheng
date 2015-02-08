@@ -75,6 +75,7 @@ define(
             if ((change.type === 'delete' || change.type === 'add') && change.context instanceof Array) { /*paths.length === 0 && */
                 change.path.pop()
                 change.type = 'update'
+                change.value = change.context
                 change.context = change.getContext(change.root, change.path)()
                 handle(event, change, defined, context, options)
                 return
@@ -121,9 +122,9 @@ define(
                 var label
                 if (DEBUG) label = DEBUG.fix(guid, 4) + DEBUG.fix(type, 16) + DEBUG.fix(change.path.join('.'), 32)
                 if (DEBUG) console.group(label)
-                if (DEBUG) console.time(DEBUG.fix(''))
+                if (DEBUG) console.time(DEBUG.fix('Flush.handle[' + type + ']'))
                 if (handle[type]) handle[type](path, event, change, defined, options)
-                if (DEBUG) console.timeEnd(DEBUG.fix(''))
+                if (DEBUG) console.timeEnd(DEBUG.fix('Flush.handle[' + type + ']'))
                 if (DEBUG) console.groupEnd(label)
             })
         }

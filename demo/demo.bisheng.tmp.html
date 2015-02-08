@@ -29,23 +29,9 @@
     </script>
 
     <script id="hello" type="template">
-        <form>
-            <div class="radio">
-                <label>
-                    <input type="radio" name="optionsRadios" value="{{radioValue1}}" checked="{{radioChecked1}}">
-                    Option one is this and that&mdash;be sure to include why it's great
-                </label>
-            </div>
-            <div class="radio">
-                <label>
-                    <input type="radio" name="optionsRadios" value="{{radioValue2}}" checked="{{radioChecked2}}">
-                    Option two can be something else and selecting it will deselect option one
-                </label>
-            </div>
-            <p>
-                {{optionsRadios}}
-            </p>
-        </form>
+        {{#each list}}
+            <p>{{array}}</p>
+        {{/each}}
     </script>
 
     <div class="container">
@@ -59,18 +45,21 @@
             // BS.auto(true)
             var tpl = $('#hello').html()
             data = {
-                optionsRadios: 'optionsRadios',
-                radioValue1: 'radioValue1',
-                radioValue2: 'radioValue2',
-                radioChecked1: true,
-                radioChecked2: false
+                list: [{
+                    array: [0]
+                }, {
+                    array: [0, 1]
+                }, {
+                    array: [0, 1, 2]
+                }]
             }
             bs = BS.bind(data, tpl, function(content){
                 $('#demo').append(content)
             })
             task = function(){
-                data.radioChecked1 = false
-                data.radioChecked2 = true
+                data.list[1].array.sort(function(a, b) {
+                    return b - a
+                })
             }
             setTimeout(function(){
                 // data.radioChecked1 = false
