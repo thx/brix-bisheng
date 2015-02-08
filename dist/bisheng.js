@@ -20,8 +20,12 @@
         X $data X $watchers √ $blocks √ $helpers √ $path
 */
 define(
-    'brix/bisheng/loop',[],
-    function() {
+    'brix/bisheng/loop',[
+        'underscore'
+    ],
+    function(
+        _
+    ) {
 
         var DEBUG = ~location.search.indexOf('bisheng.debug') && {
             fix: function(arg, len) {
@@ -81,7 +85,7 @@ define(
             * Loop.unwatch(unwatch)
             * Loop.clone(clone)
             * Loop.diff(diff)
-            * Loop.letMeSee(letMeSee)
+            * Loop.letMeSee([data [, tpl ]])
 
         */
         var Loop = (function() {
@@ -166,6 +170,7 @@ define(
                         if (DEBUG) console.timeEnd(DEBUG.fix('shadow'))
                     }
                 }
+                task = _.throttle(task, 10)
                 task.data = data
                 task.callback = fn
                 if (fn && fn.tpl) task.tpl = fn.tpl
@@ -1939,12 +1944,12 @@ define(
                     }
 
                     var label
-                    if (DEBUG) label = DEBUG.fix('flush [' + index + '] ' + change.path.join('.'))
-                    if (DEBUG) console.group(label)
+                    if (DEBUG) label = DEBUG.fix('flush changes[' + index + '] ' + change.path.join('.'))
                     if (DEBUG) console.time(label)
+                    if (DEBUG) console.group(label)
                     Flush.handle(event, change, clone, context, options)
-                    if (DEBUG) console.timeEnd(label)
                     if (DEBUG) console.groupEnd(label)
+                    if (DEBUG) console.timeEnd(label)
                     if (DEBUG) console.log('>', change.path.join('.'))
 
                     if (location.href.indexOf('scrollIntoView') > -1) Flush.scrollIntoView(event, data)

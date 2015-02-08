@@ -108,12 +108,12 @@ define(
                     }
 
                     var label
-                    if (DEBUG) label = DEBUG.fix('flush [' + index + '] ' + change.path.join('.'))
-                    if (DEBUG) console.group(label)
+                    if (DEBUG) label = DEBUG.fix('flush changes[' + index + '] ' + change.path.join('.'))
                     if (DEBUG) console.time(label)
+                    if (DEBUG) console.group(label)
                     Flush.handle(event, change, clone, context, options)
-                    if (DEBUG) console.timeEnd(label)
                     if (DEBUG) console.groupEnd(label)
+                    if (DEBUG) console.timeEnd(label)
                     if (DEBUG) console.log('>', change.path.join('.'))
 
                     if (location.href.indexOf('scrollIntoView') > -1) Flush.scrollIntoView(event, data)

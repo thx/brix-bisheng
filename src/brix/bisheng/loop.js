@@ -19,8 +19,12 @@
         X $data X $watchers √ $blocks √ $helpers √ $path
 */
 define(
-    [],
-    function() {
+    [
+        'underscore'
+    ],
+    function(
+        _
+    ) {
 
         var DEBUG = ~location.search.indexOf('bisheng.debug') && {
             fix: function(arg, len) {
@@ -80,7 +84,7 @@ define(
             * Loop.unwatch(unwatch)
             * Loop.clone(clone)
             * Loop.diff(diff)
-            * Loop.letMeSee(letMeSee)
+            * Loop.letMeSee([data [, tpl ]])
 
         */
         var Loop = (function() {
@@ -165,6 +169,7 @@ define(
                         if (DEBUG) console.timeEnd(DEBUG.fix('shadow'))
                     }
                 }
+                task = _.throttle(task, 10)
                 task.data = data
                 task.callback = fn
                 if (fn && fn.tpl) task.tpl = fn.tpl

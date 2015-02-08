@@ -29,19 +29,23 @@
     </script>
 
     <script id="hello" type="template">
-        <div class="comments {{#if comments}}hello{{/if}}">
-          {{#if comments}}
-          {{#each comments}}
-            <div class="comment">
-              <h2>{{subject}}</h2>
-              <span>{{{body}}}</span>
+        <form>
+            <div class="radio">
+                <label>
+                    <input type="radio" name="optionsRadios" value="{{radioValue1}}" checked="{{radioChecked1}}">
+                    Option one is this and that&mdash;be sure to include why it's great
+                </label>
             </div>
-          {{/each}}
-          {{/if}}
-          {{#unless comments}}
-            <h3 class="warning">WARNING: This entry does not have any records!</h3>
-          {{/unless}}
-        </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" name="optionsRadios" value="{{radioValue2}}" checked="{{radioChecked2}}">
+                    Option two can be something else and selecting it will deselect option one
+                </label>
+            </div>
+            <p>
+                {{optionsRadios}}
+            </p>
+        </form>
     </script>
 
     <div class="container">
@@ -55,40 +59,23 @@
             // BS.auto(true)
             var tpl = $('#hello').html()
             data = {
-                fbdata: fbdata,
-                comments: []
-            }
-            for (var i = 0; i < 1000; i++) {
-                data.comments.push({
-                    subject: 'subject' + Math.random(),
-                    body: 'body' + Math.random(),
-                    nested: {
-                        nested: {
-                            nested: {
-                                nested: {
-                                    nested: {
-
-                                    }
-                                }
-                            }
-                        }
-                    }
-                })
+                optionsRadios: 'optionsRadios',
+                radioValue1: 'radioValue1',
+                radioValue2: 'radioValue2',
+                radioChecked1: true,
+                radioChecked2: false
             }
             bs = BS.bind(data, tpl, function(content){
                 $('#demo').append(content)
             })
+            task = function(){
+                data.radioChecked1 = false
+                data.radioChecked2 = true
+            }
             setTimeout(function(){
-                console.log(data.comments.length)
-                data.comments.push({
-                    subject: 'subject' + Math.random(),
-                    body: 'body' + Math.random()
-                })
-                // data.comments.push({
-                //     subject: 'subject' + Math.random(),
-                //     body: 'body' + Math.random()
-                // })
-                bs.apply()
+                // data.radioChecked1 = false
+                // data.radioChecked2 = true
+                // bs.apply()
             }, 10)
             
             // bs.apply()
