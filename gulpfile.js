@@ -2,6 +2,7 @@
 /* global console */
 
 var gulp = require('gulp')
+var connect = require('gulp-connect')
 var jshint = require('gulp-jshint')
 var mochaPhantomJS = require('gulp-mocha-phantomjs')
 var rjs = require('gulp-requirejs')
@@ -20,6 +21,13 @@ ______        _        ______  _  _____  _
                                                              |___/ 
         */
     }).toString().split('\n').slice(2, -2).join('\n') + '\n')
+})
+
+// https://github.com/AveVlad/gulp-connect
+gulp.task('connect', function() {
+    connect.server({
+        port: 4246
+    })
 })
 
 // https://github.com/spenceralger/gulp-jshint

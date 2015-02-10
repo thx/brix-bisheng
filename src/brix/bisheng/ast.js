@@ -16,10 +16,12 @@
 */
 define(
     [
+        'underscore',
         'handlebars',
         './locator'
     ],
     function(
+        _,
         Handlebars,
         Locator
     ) {
@@ -84,7 +86,7 @@ define(
 
                 var prop = []
                 if (node.isHelper) {
-                    node.params.forEach(function(param) {
+                    _.each(node.params, function(param, index) {
                         if (param.type === 'ID') {
                             prop.push(param.string)
                         }

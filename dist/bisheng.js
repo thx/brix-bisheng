@@ -805,10 +805,12 @@ define(
 */
 define(
     'brix/bisheng/ast',[
+        'underscore',
         'handlebars',
         './locator'
     ],
     function(
+        _,
         Handlebars,
         Locator
     ) {
@@ -873,7 +875,7 @@ define(
 
                 var prop = []
                 if (node.isHelper) {
-                    node.params.forEach(function(param) {
+                    _.each(node.params, function(param, index) {
                         if (param.type === 'ID') {
                             prop.push(param.string)
                         }
@@ -1160,7 +1162,13 @@ define(
 
         // 扫描子节点
         function scanChildNode(node) {
-            _.each([].slice.call(node.childNodes), function(childNode /*, index*/ ) {
+            // “Array.prototype.slice: 'this' is not a JavaScript object” error in IE8
+            // [].slice.call(node.childNodes)
+            var tmp = []
+            for (var i = 0, childNodes = node.childNodes, len = childNodes.length; i < len; i++) {
+                tmp.push(childNodes[i])
+            }
+            _.each(tmp, function(childNode /*, index*/ ) {
                 scanNode(childNode)
             })
         }

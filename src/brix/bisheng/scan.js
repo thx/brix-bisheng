@@ -179,7 +179,13 @@ define(
 
         // 扫描子节点
         function scanChildNode(node) {
-            _.each([].slice.call(node.childNodes), function(childNode /*, index*/ ) {
+            // “Array.prototype.slice: 'this' is not a JavaScript object” error in IE8
+            // [].slice.call(node.childNodes)
+            var tmp = []
+            for (var i = 0, childNodes = node.childNodes, len = childNodes.length; i < len; i++) {
+                tmp.push(childNodes[i])
+            }
+            _.each(tmp, function(childNode /*, index*/ ) {
                 scanNode(childNode)
             })
         }
