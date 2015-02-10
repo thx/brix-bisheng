@@ -99,6 +99,41 @@ describe('Watch', function() {
         doBiShengWatch(data, 'list', task, expected, done)
     })
 
+    it('BiSheng.watch(data, property, fn(change)) + BiSheng.bind(data, tpl)', function(done) {
+        BiSheng.auto(false)
+        var container = $('div.container')
+        var data = {
+            list: [{
+                value: 1,
+            }, {
+                value: 2
+            }]
+        }
+        var tpl = '{{#each list}}<input value="{{value}}">{{/each}}'
+        var task = function() {
+            container.find('input:eq(0)').val(123).trigger('change')
+        }
+        var expected = {
+            type: 'update',
+            path: ['list', '0', 'value'],
+            value: '123',
+            oldValue: 1
+        }
+        BiSheng.bind(data, tpl, function(content) {
+            container.append(content)
+        })
+        BiSheng.watch(data, 'list', function(change) {
+            expect(change).to.deep.equal(expected)
+
+            BiSheng.unbind(data, tpl)
+            BiSheng.unwatch(data, 'list')
+            BiSheng.auto(true)
+
+            done()
+        })
+        task()
+    })
+
     /*
         var data = {}
         BiSheng.watch(data, ['a', 'b', 'c'], function(change) {
