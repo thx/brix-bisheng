@@ -30,7 +30,7 @@
 
     <script id="hello" type="template">
         {{#each list}}
-            <p>{{array}}</p>
+            <input value="{{scaleValue}}">
         {{/each}}
     </script>
 
@@ -45,22 +45,35 @@
             // BS.auto(true)
             var tpl = $('#hello').html()
             data = {
-                list: [{
-                    array: [0]
+                "list": [{
+                    "siteId": 1481,
+                    "catId": 7,
+                    "scaleMin": 0.5,
+                    "scaleMax": 50.0,
+                    "scaleOldValue": 0,
+                    "scaleValue": 7.0,
+                    "catName": "数码、电脑",
+                    "offerCount": 16
                 }, {
-                    array: [0, 1]
-                }, {
-                    array: [0, 1, 2]
+                    "siteId": 1481,
+                    "catId": 68,
+                    "scaleMin": 0.5,
+                    "scaleMax": 50.0,
+                    "scaleOldValue": 0,
+                    "scaleValue": 2.0,
+                    "catName": "包装",
+                    "offerCount": 1
                 }]
-            }
+            } 
             bs = BS.bind(data, tpl, function(content){
                 $('#demo').append(content)
             })
             task = function(){
-                data.list[1].array.sort(function(a, b) {
-                    return b - a
-                })
+                
             }
+            BS.watch(data, 'list', function(changes){
+                console.log(changes)
+            })
             setTimeout(function(){
                 // data.radioChecked1 = false
                 // data.radioChecked2 = true

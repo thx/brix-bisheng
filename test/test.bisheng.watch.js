@@ -82,6 +82,23 @@ describe('Watch', function() {
         doBiShengWatch(data, 'foo', task, expected, done)
     })
 
+    it('BiSheng.watch(data, property, fn(change)), nested', function(done) {
+        var data = {
+            list: [{
+                foo: {}
+            }]
+        }
+        var task = function() {
+            data.list[0].foo.bar = 123
+        }
+        var expected = {
+            type: 'add',
+            path: ['list', '0', 'foo', 'bar'],
+            value: 123
+        }
+        doBiShengWatch(data, 'list', task, expected, done)
+    })
+
     /*
         var data = {}
         BiSheng.watch(data, ['a', 'b', 'c'], function(change) {

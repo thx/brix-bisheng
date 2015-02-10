@@ -212,7 +212,7 @@ define(
                     }
 
                     updateValue(data, path, event.target)
-                    if (!Loop.auto()) Loop.letMeSee(data, tpl)
+                    if (!Loop.auto()) Loop.letMeSee(data /*, tpl*/ )
                 })
             })
 
@@ -247,7 +247,7 @@ define(
                                 .trigger('change.bisheng', firing = true)
                         }
                         updateChecked(data, path, event.target)
-                        if (!Loop.auto()) Loop.letMeSee(data, tpl)
+                        if (!Loop.auto()) Loop.letMeSee(data /*, tpl*/ )
                     })
                 })
         }
