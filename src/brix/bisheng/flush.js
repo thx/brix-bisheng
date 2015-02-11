@@ -341,7 +341,7 @@ define(
                     after(options, ['add', 'block'], [element])
 
                     before(options, ['delete', 'block'], [target[index]])
-                    target[index].parentNode.removeChild(target[index])
+                    if (target[index].parentNode) target[index].parentNode.removeChild(target[index])
                     after(options, ['delete', 'block'], [target[index]])
 
                     event.target.push(element)
@@ -375,7 +375,7 @@ define(
                         after(options, ['add', 'block'], [element])
 
                         before(options, ['delete', 'block'], [target[index]])
-                        target[index].parentNode.removeChild(target[index])
+                        if (target[index].parentNode) target[index].parentNode.removeChild(target[index])
                         after(options, ['delete', 'block'], [target[index]])
 
                         event.target.push(element)
