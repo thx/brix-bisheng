@@ -30,7 +30,7 @@
 
     <script id="hello" type="template">
         {{#each list}}
-            <input value="{{scaleValue}}">
+            <input value="{{scaleValue}}" disabled="{{disabled}}">
         {{/each}}
     </script>
 
@@ -53,7 +53,8 @@
                     "scaleOldValue": 0,
                     "scaleValue": 7.0,
                     "catName": "数码、电脑",
-                    "offerCount": 16
+                    "offerCount": 16,
+                    disabled: true
                 }, {
                     "siteId": 1481,
                     "catId": 68,
@@ -62,7 +63,8 @@
                     "scaleOldValue": 0,
                     "scaleValue": 2.0,
                     "catName": "包装",
-                    "offerCount": 1
+                    "offerCount": 1,
+                    disabled: false
                 }]
             } 
             bs = BS.bind(data, tpl, function(content){

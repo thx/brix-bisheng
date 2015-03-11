@@ -86,7 +86,7 @@ define(
 
                 var prop = []
                 if (node.isHelper) {
-                    _.each(node.params, function(param, index) {
+                    _.each(node.params, function(param /*, index*/ ) {
                         if (param.type === 'ID') {
                             prop.push(param.string)
                         }

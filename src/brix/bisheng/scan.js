@@ -84,6 +84,19 @@ define(
                     $(node).attr('src', value)
                 }
             },
+            'bs-disabled': {
+                name: 'disabled',
+                setup: function() {},
+                teardown: function(node, value) {
+                    if (value === 'false' || value === 'disabled') {
+                        $(node).attr('disabled', 'disabled')
+                            .prop('disabled', true)
+                    } else {
+                        $(node).attr('disabled', false)
+                            .prop('disabled', false)
+                    }
+                }
+            },
             'bs-checked': {
                 name: 'checked',
                 setup: function() {},
@@ -249,6 +262,29 @@ define(
                         updateChecked(data, path, event.target)
                         if (!Loop.auto()) Loop.letMeSee(data /*, tpl*/ )
                     })
+                })
+
+            _.each(Locator.find({
+                    slot: "start",
+                    type: "attribute",
+                    name: "disabled"
+                }, node),
+                function(locator) {
+                    var path = Locator.parse(locator, 'path').split('.'),
+                        target = Locator.parseTarget(locator)[0];
+
+                    var value = data
+                    for (var index = 1; index < path.length; index++) {
+                        value = value[path[index]]
+                    }
+                    // 如果 disabled 的初始值是 false 或 "false"，则初始化为不禁用。
+                    if (value === undefined || value.valueOf() === false || value.valueOf() === 'false') {
+                        $(target).prop('disabled', false)
+                    }
+                    if (value !== undefined &&
+                        (value.valueOf() === true || value.valueOf() === 'true' || value.valueOf() === 'disabled')) {
+                        $(target).prop('disabled', true)
+                    }
                 })
         }
 

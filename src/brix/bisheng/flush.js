@@ -232,6 +232,9 @@ define(
                     }
                     $target.data('user is editing', false)
                     break
+                case 'disabled':
+                    $target.prop(name, value)
+                    break
                 case 'checked':
                     $target.prop(name, value)
 

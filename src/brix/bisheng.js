@@ -131,6 +131,7 @@ define(
             var originalTpl = tpl
             tpl = tpl.replace(/(<.*?)(style)(=.*?>)/g, '$1bs-style$3')
                 .replace(/(<input.*?)(checked)(=.*?>)/g, '$1bs-checked$3')
+                .replace(/(<input.*?)(disabled)(=.*?>)/g, '$1bs-disabled$3')
                 .replace(/(<img.*?)(src)(=.*?>)/g, '$1bs-src$3')
 
             // 修改 AST，为 Expression 和 Block 插入占位符

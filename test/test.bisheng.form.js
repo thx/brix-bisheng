@@ -418,4 +418,70 @@ describe('Form', function() {
         bindThenCheck(data, tpl, task, expected, done, before)
     })
 
+    it('checkbox, disabled, data => dom, false => true', function(done) {
+        var tpl = heredoc(function() {
+            /*
+<label>
+    <input type="checkbox" disabled="{{checkboxDisabled}}">
+    Option one is this and that&mdash;be sure to include why it's great
+</label>
+<p>
+    {{#if checkboxDisabled}}
+        Ok.
+    {{else}}
+        Your must agree it!
+    {{/if}}
+</p>
+        */
+        })
+        var data = {
+            checkboxDisabled: false
+        }
+        var task = function( /*container*/ ) {
+            data.checkboxDisabled = true
+        }
+        var expected = function(container) {
+            expect(container.find('input').prop('disabled')).to.be.true()
+            expect($.trim(container.find('p').text())).to.equal('Ok.')
+        }
+        var before = function(container) {
+            expect(container.find('input').prop('checked')).to.be.false()
+            expect($.trim(container.find('p').text())).to.equal('Your must agree it!')
+        }
+        bindThenCheck(data, tpl, task, expected, done, before)
+    })
+
+    it('checkbox, disabled, data => dom, true => false', function(done) {
+        var tpl = heredoc(function() {
+            /*
+<label>
+    <input type="checkbox" disabled="{{checkboxDisabled}}">
+    Option one is this and that&mdash;be sure to include why it's great
+</label>
+<p>
+    {{#if checkboxDisabled}}
+        Ok.
+    {{else}}
+        Your must agree it!
+    {{/if}}
+</p>
+        */
+        })
+        var data = {
+            checkboxDisabled: 'disabled'
+        }
+        var task = function( /*container*/ ) {
+            data.checkboxDisabled = false
+        }
+        var expected = function(container) {
+            expect(container.find('input').prop('disabled')).to.be.false()
+            expect($.trim(container.find('p').text())).to.equal('Your must agree it!')
+        }
+        var before = function(container) {
+            expect(container.find('input').prop('disabled')).to.be.true()
+            expect($.trim(container.find('p').text())).to.equal('Ok.')
+        }
+        bindThenCheck(data, tpl, task, expected, done, before)
+    })
+
 })
