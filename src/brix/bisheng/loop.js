@@ -154,7 +154,7 @@ define(
                 var id = guid++;
                 var shadow = clone(data, autoboxing, [id])
 
-                function task(index) {
+                var task = function(index) {
                     if (DEBUG) console.group('task ' + index)
                     if (DEBUG) console.time(DEBUG.fix('diff'))
                     var result = diff(data, shadow, autoboxing ? [id] : [], autoboxing)
