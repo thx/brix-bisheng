@@ -97,7 +97,7 @@ describe('Form', function() {
         var tpl = heredoc(function() {
             /*
 <p> 
-    <select class="form-control" value="{{role}}"">
+    <select class="form-control" value="{{role}}">
         <option>Admin</option>
         <option>User</option>
     </select>
