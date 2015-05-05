@@ -981,7 +981,7 @@ define(
         }
     }
 );
-/* global define, console, location */
+/* global define */
 /*
     # Scanner
 
@@ -997,15 +997,6 @@ define(
         $, _,
         Loop, Locator
     ) {
-
-        var DEBUG = ~location.search.indexOf('bisheng.debug') && {
-            fix: function(arg, len) {
-                len = len || 32
-                var fix = parseInt(len, 10) - ('' + arg).length
-                for (var i = 0; i < fix; i++) arg += ' '
-                return arg
-            }
-        }
 
         // 入口方法
         function scan(node, data, tpl) {
@@ -1187,7 +1178,7 @@ define(
         }
 
         // 扫描表单元素
-        function scanFormElements(node, data, tpl) {
+        function scanFormElements(node, data /*, tpl*/ ) {
             var locators = Locator.find({
                 slot: "start",
                 type: "attribute",
