@@ -211,8 +211,32 @@ define(
         JsonCommentLocator.ScriptLocator = ScriptLocator
         JsonCommentLocator.JsonCommentLocator = JsonCommentLocator
 
-        return location.search.indexOf('locator=script') !== -1 ? ScriptLocator :
+        var Location = location.search.indexOf('locator=script') !== -1 ? ScriptLocator :
             location.search.indexOf('locator=comment') !== -1 ? JsonCommentLocator :
             ScriptLocator
+
+        window.__count = {}
+        window.__time = {}
+        for (var method in Location) {
+            if (!Location[method].apply) continue
+
+            (function(method, fn) {
+                Location[method] = function() {
+                    try {
+                        // console.time('Location.' + method)
+                        var now = (new Date()).getTime()
+                        return fn.apply(Location, [].slice.call(arguments, 0))
+                    } finally {
+                        // console.timeEnd('Location.' + method)
+                        window.__count[method] = window.__count[method] || 0
+                        window.__count[method] += 1
+                        window.__time[method] = window.__time[method] || 0
+                        window.__time[method] += (new Date()).getTime() - now
+                    }
+                }
+            })(method, Location[method])
+        }
+
+        return Location
     }
 )

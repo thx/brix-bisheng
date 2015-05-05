@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test: Brix Event </title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+        .transition {
+            transition: background-color 0.5s ease, width 0.5s ease, height 0.5s ease;
+        }
+        .highlight {
+            background-color: yellow;
+        }
+    </style>
+</head>
+<body>
+    <!-- Include RequireJS -->
+    <script src="./bower_components/requirejs/require.js"></script>
+    <script type="text/javascript">
+        require.config({
+            paths: {
+                'brix/bisheng': '../dist/bisheng',
+                jquery: 'bower_components/jquery/dist/jquery',
+                underscore: 'bower_components/underscore/underscore',
+                handlebars: 'bower_components/handlebars/handlebars'
+            }
+        })
+    </script>
+    <script id="hello" type="template">
+        <div class="row">
+            <div class="col-xs-6">
+                <form class="form-horizontal">
+                    {{#each list}}
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">{{id}}</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" value="{{id}}">
+                        </div>
+                    </div>
+                    {{/each}}
+                </form>
+            </div>
+            <div class="col-xs-6">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>id</th>
+                            <th>id</th>
+                            <th>id</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each list}}
+                        <tr>
+                            <th scope="row">{{id}}</th>
+                            <td>{{id}}</td>
+                            <td>{{id}}</td>
+                            <td>{{id}}</td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </script>
+    <div class="container" style="margin-top: 30px;"></div>
+
+    <script type="text/javascript">
+        require(['jquery', 'handlebars', 'brix/bisheng'], function($, Handlebars, BS) {
+            window.BS = BS
+            // BS.auto(true)
+            var tpl = $('#hello').html()
+            var data = {
+                list: []
+            }
+            for (var i = 0; i < 100; i++) {
+                data.list.push({
+                    id: i
+                })
+            }
+            BS.bind(data, tpl, function(content){
+                $('.container').append(content)
+            })
+        })
+    </script>
+
+</body>
+</html>
