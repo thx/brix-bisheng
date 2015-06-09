@@ -13,8 +13,10 @@
     "gulp": "*",
     "gulp-connect": "*",
     "gulp-jshint": "*",
-    "jshint-stylish": "*",
     "gulp-mocha-phantomjs": "*",
-    "gulp-requirejs": "*"
+    "gulp-requirejs": "*",
+    "gulp-uglify": "^1.2.0",
+    "jshint-stylish": "*",
+    "through2": "^0.6.5"
   }
 }
